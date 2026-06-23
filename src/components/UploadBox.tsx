@@ -18,8 +18,11 @@ export default function UploadBox() {
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [analysisResult, setAnalysisResult] = useState<unknown>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -32,6 +35,8 @@ export default function UploadBox() {
     setPreviewUrl(null);
     setError(null);
     setSuccess(false);
+    setIsAnalyzing(false);
+    setAnalysisResult(null);
     setCroppedAreaPixels(null);
   };
 
@@ -115,6 +120,32 @@ export default function UploadBox() {
 
       if (uploadError) throw uploadError;
 
+      // Start Analysis
+      setIsUploading(false);
+      setIsAnalyzing(true);
+
+      const response = await fetch('/api/process', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ session_id: sessionId, file_path: filePath }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        if (result.error === 'not_a_prescription') {
+          setError("This doesn't look like a prescription. Please upload a clear photo of a doctor's prescription.");
+        } else if (result.error === 'unreadable') {
+          setError("We couldn't read this prescription clearly. Try a better-lit photo or a higher quality image.");
+        } else {
+          setError("Something went wrong while analyzing. Please try again.");
+        }
+        setIsAnalyzing(false);
+        return;
+      }
+
+      console.log('Analysis result:', result);
+      setAnalysisResult(result);
       setSuccess(true);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to upload prescription. Please try again.';
@@ -140,8 +171,8 @@ export default function UploadBox() {
         <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
           <span className="text-3xl">✅</span>
         </div>
-        <h3 className="text-xl font-bold text-green-800 mb-2">Upload Successful</h3>
-        <p className="text-green-700">Prescription uploaded successfully. Processing coming next.</p>
+        <h3 className="text-xl font-bold text-green-800 mb-2">Analysis complete!</h3>
+        <p className="text-green-700">Showing results...</p>
         <button
           onClick={resetState}
           className="mt-6 text-sm font-medium text-green-800 underline underline-offset-4"
@@ -225,13 +256,18 @@ export default function UploadBox() {
 
             <button
               onClick={handleUpload}
-              disabled={isUploading}
+              disabled={isUploading || isAnalyzing}
               className="w-full sm:w-auto px-8 py-3 bg-[#2563EB] text-white rounded-full font-bold flex items-center justify-center gap-3 hover:bg-blue-700 transition-colors disabled:bg-blue-300"
             >
               {isUploading ? (
                 <>
                   <Spinner size="sm" />
                   Uploading...
+                </>
+              ) : isAnalyzing ? (
+                <>
+                  <Spinner size="sm" />
+                  Analyzing your prescription...
                 </>
               ) : (
                 'Confirm & Upload'
