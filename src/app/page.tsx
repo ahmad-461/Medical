@@ -1,3 +1,5 @@
+import UploadBox from '@/components/UploadBox';
+
 export default function Home() {
   return (
     <div className="flex flex-col items-center">
@@ -10,13 +12,8 @@ export default function Home() {
           Upload a photo of your prescription and get a plain-English explanation of every medicine, dosage, and instruction.
         </p>
 
-        {/* Upload Box Placeholder */}
-        <div className="w-full max-w-2xl mx-auto border-2 border-dashed border-slate-300 rounded-2xl p-12 bg-slate-50 flex flex-col items-center justify-center transition-colors hover:border-[#2563EB] group">
-          <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-            <span className="text-3xl">📄</span>
-          </div>
-          <p className="text-slate-500 font-medium">Upload coming in next phase</p>
-        </div>
+        {/* Upload Box */}
+        <UploadBox />
       </section>
 
       {/* Trust Strip */}
