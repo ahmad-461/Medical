@@ -7,6 +7,8 @@ import { supabase } from '@/lib/supabase';
 import { getOrCreateSessionId } from '@/lib/session';
 import { getCroppedImg } from '@/lib/cropImage';
 import Spinner from './Spinner';
+import { PrescriptionResult } from '@/types/prescription';
+import ResultsPanel from './ResultsPanel';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/heic', 'application/pdf'];
@@ -21,8 +23,7 @@ export default function UploadBox() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [analysisResult, setAnalysisResult] = useState<unknown>(null);
+  const [result, setResult] = useState<PrescriptionResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -36,7 +37,7 @@ export default function UploadBox() {
     setError(null);
     setSuccess(false);
     setIsAnalyzing(false);
-    setAnalysisResult(null);
+    setResult(null);
     setCroppedAreaPixels(null);
   };
 
@@ -145,7 +146,7 @@ export default function UploadBox() {
       }
 
       console.log('Analysis result:', result);
-      setAnalysisResult(result);
+      setResult(result);
       setSuccess(true);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to upload prescription. Please try again.';
@@ -165,22 +166,8 @@ export default function UploadBox() {
   const triggerUpload = () => fileInputRef.current?.click();
   const triggerCamera = () => cameraInputRef.current?.click();
 
-  if (success) {
-    return (
-      <div className="w-full max-w-2xl mx-auto p-8 bg-green-50 border border-green-200 rounded-2xl text-center">
-        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-          <span className="text-3xl">✅</span>
-        </div>
-        <h3 className="text-xl font-bold text-green-800 mb-2">Analysis complete!</h3>
-        <p className="text-green-700">Showing results...</p>
-        <button
-          onClick={resetState}
-          className="mt-6 text-sm font-medium text-green-800 underline underline-offset-4"
-        >
-          Upload another
-        </button>
-      </div>
-    );
+  if (success && result) {
+    return <ResultsPanel data={result} onReset={resetState} />;
   }
 
   return (
