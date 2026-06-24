@@ -179,6 +179,7 @@ export default function ResultsPanel({ data, onReset }: ResultsPanelProps) {
                     </div>
                     <button
                       onClick={handleSave}
+                      aria-label={`Save changes for ${editValues?.name}`}
                       className="w-full py-2 bg-[#2563EB] text-white rounded-lg font-semibold hover:bg-blue-700 transition-colors"
                     >
                       Save
@@ -193,6 +194,7 @@ export default function ResultsPanel({ data, onReset }: ResultsPanelProps) {
                       </div>
                       <button
                         onClick={() => handleEdit(index)}
+                        aria-label={`Edit ${med.name} information`}
                         className="text-sm font-medium text-[#2563EB] hover:underline no-print"
                       >
                         Doesn&apos;t look right? Edit
@@ -256,6 +258,7 @@ export default function ResultsPanel({ data, onReset }: ResultsPanelProps) {
         <button
           onClick={handleDownloadPDF}
           disabled={isGeneratingPDF}
+          aria-label={isGeneratingPDF ? "Generating PDF document" : "Download prescription as PDF"}
           className="flex-1 px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-full font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isGeneratingPDF ? (
@@ -271,12 +274,14 @@ export default function ResultsPanel({ data, onReset }: ResultsPanelProps) {
         </button>
         <button
           onClick={() => window.print()}
+          aria-label="Print prescription"
           className="flex-1 px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-full font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
         >
           <span>🖨️</span> Print
         </button>
         <button
           onClick={onReset}
+          aria-label="Read another prescription"
           className="flex-[1.5] px-6 py-3 bg-[#2563EB] text-white rounded-full font-bold hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
         >
           Read Another Prescription

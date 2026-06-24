@@ -24,9 +24,9 @@ export default function RootLayout({
               RxReader
             </Link>
             <div className="flex items-center">
-              <a href="#" className="text-sm font-medium text-slate-500 pointer-events-none opacity-50">
+              <button disabled className="text-sm font-medium text-slate-500 opacity-50 cursor-not-allowed">
                 More Tools
-              </a>
+              </button>
             </div>
           </nav>
         </header>
@@ -35,9 +35,20 @@ export default function RootLayout({
           {children}
         </main>
 
-        <footer className="border-t border-slate-100 py-8 mt-auto">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm text-slate-500">
-            <p>© 2026 RxReader · For informational purposes only · Not medical advice</p>
+        <footer className="border-t border-gray-200 py-8 mt-auto bg-white">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+              <div className="text-sm text-gray-500 text-center md:text-left">
+                <p className="font-semibold text-gray-900">© 2026 RxReader</p>
+                <p>For informational purposes only</p>
+              </div>
+              <div className="flex flex-wrap justify-center gap-x-6 gap-y-2">
+                <Link href="/about" className="text-gray-500 hover:text-gray-700 text-sm transition-colors">About</Link>
+                <Link href="/privacy-policy" className="text-gray-500 hover:text-gray-700 text-sm transition-colors">Privacy Policy</Link>
+                <Link href="/disclaimer" className="text-gray-500 hover:text-gray-700 text-sm transition-colors">Disclaimer</Link>
+                <Link href="/contact" className="text-gray-500 hover:text-gray-700 text-sm transition-colors">Contact</Link>
+              </div>
+            </div>
           </div>
         </footer>
       </body>
