@@ -202,6 +202,7 @@ export default function UploadBox() {
 
           <button
             className="mt-6 md:hidden px-6 py-3 bg-[#2563EB] text-white rounded-full font-semibold flex items-center gap-2"
+            aria-label="Take a photo of your prescription using your camera"
             onClick={(e) => {
               e.stopPropagation();
               triggerCamera();
@@ -237,6 +238,7 @@ export default function UploadBox() {
               onClick={resetState}
               className="text-slate-500 font-medium hover:text-slate-700 disabled:opacity-50"
               disabled={isUploading}
+              aria-label="Cancel and choose a different file"
             >
               Cancel
             </button>
@@ -244,6 +246,7 @@ export default function UploadBox() {
             <button
               onClick={handleUpload}
               disabled={isUploading || isAnalyzing}
+              aria-label={isUploading ? "Uploading prescription" : isAnalyzing ? "Analyzing prescription" : "Confirm and upload prescription for analysis"}
               className="w-full sm:w-auto px-8 py-3 bg-[#2563EB] text-white rounded-full font-bold flex items-center justify-center gap-3 hover:bg-blue-700 transition-colors disabled:bg-blue-300"
             >
               {isUploading ? (
@@ -270,6 +273,7 @@ export default function UploadBox() {
         onChange={onFileChange}
         accept=".jpg,.jpeg,.png,.heic,.pdf"
         className="hidden"
+        aria-label="Upload prescription file"
       />
       <input
         type="file"
@@ -278,6 +282,7 @@ export default function UploadBox() {
         accept="image/*"
         capture="environment"
         className="hidden"
+        aria-label="Take prescription photo"
       />
     </div>
   );
