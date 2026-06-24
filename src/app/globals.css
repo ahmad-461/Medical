@@ -13,3 +13,15 @@
     padding: 0;
   }
 }
+
+.pdf-only {
+  display: none;
+}
+
+.generating-pdf .pdf-only {
+  display: block !important;
+}
+
+.generating-pdf .no-print {
+  display: none !important;
+}
