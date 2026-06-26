@@ -8,12 +8,15 @@ import { getOrCreateSessionId } from '@/lib/session';
 import { getCroppedImg } from '@/lib/cropImage';
 import Spinner from './Spinner';
 import { PrescriptionResult } from '@/types/prescription';
-import ResultsPanel from './ResultsPanel';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/heic', 'application/pdf'];
 
-export default function UploadBox() {
+interface UploadBoxProps {
+  onResult: (data: PrescriptionResult) => void;
+}
+
+export default function UploadBox({ onResult }: UploadBoxProps) {
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
@@ -22,8 +25,6 @@ export default function UploadBox() {
   const [isUploading, setIsUploading] = useState(false);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState(false);
-  const [result, setResult] = useState<PrescriptionResult | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -35,9 +36,7 @@ export default function UploadBox() {
     setFile(null);
     setPreviewUrl(null);
     setError(null);
-    setSuccess(false);
     setIsAnalyzing(false);
-    setResult(null);
     setCroppedAreaPixels(null);
   };
 
@@ -148,8 +147,7 @@ export default function UploadBox() {
       }
 
       console.log('Analysis result:', result);
-      setResult(result);
-      setSuccess(true);
+      onResult(result);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to upload prescription. Please try again.';
       setError(errorMessage);
@@ -167,10 +165,6 @@ export default function UploadBox() {
 
   const triggerUpload = () => fileInputRef.current?.click();
   const triggerCamera = () => cameraInputRef.current?.click();
-
-  if (success && result) {
-    return <ResultsPanel data={result} onReset={resetState} />;
-  }
 
   return (
     <div className="w-full max-w-2xl mx-auto">
