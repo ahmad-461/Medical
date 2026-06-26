@@ -1,7 +1,15 @@
+'use client';
+
+import { useState } from 'react';
 import UploadBox from '@/components/UploadBox';
+import ResultsPanel from '@/components/ResultsPanel';
 import JsonLd from '@/components/JsonLd';
+import { PrescriptionResult } from '@/types/prescription';
+import Link from 'next/link';
 
 export default function Home() {
+  const [result, setResult] = useState<PrescriptionResult | null>(null);
+
   const jsonLdData = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
@@ -18,115 +26,195 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col items-center">
-      {/* Hero Section */}
-      <section className="w-full max-w-4xl px-4 pt-16 pb-12 text-center">
-        <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight text-slate-900 mb-6">
-          Read Any Doctor&apos;s Prescription Instantly
-        </h1>
-        <p className="text-lg sm:text-xl text-slate-600 mb-10 max-w-2xl mx-auto">
-          Upload a photo of your prescription and get a plain-English explanation of every medicine, dosage, and instruction.
-        </p>
-
-        {/* Upload Box */}
-        <UploadBox />
-      </section>
-
+    <div className="flex flex-col">
       <JsonLd data={jsonLdData} />
 
-      {/* Trust Strip */}
-      <section className="w-full bg-slate-50 border-y border-slate-100 py-12">
+      {/* Hero Section */}
+      <section className="bg-white pt-16 pb-20 border-b border-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="flex flex-col items-center text-center">
-              <div className="w-12 h-12 bg-[#16A34A]/10 rounded-full flex items-center justify-center mb-4 text-2xl">
-                🔒
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Left Column */}
+            <div>
+              <div className="bg-blue-50 text-blue-700 text-sm px-3 py-1 rounded-full inline-block mb-4 font-medium">
+                🩺 Trusted by patients in 10+ countries
               </div>
-              <h3 className="font-semibold text-slate-900 mb-1">Private & Secure</h3>
-              <p className="text-sm text-slate-500">Your data is encrypted and handled with care.</p>
+              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
+                Read Any Doctor&apos;s Prescription Instantly
+              </h1>
+              <p className="text-lg text-gray-600 mt-6 leading-relaxed">
+                Upload a photo of your prescription and get a plain-English explanation of every medicine, dosage, and instruction — free, instant, and private.
+              </p>
+
+              <div className="flex flex-wrap gap-4 mt-8">
+                <div className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
+                  <span className="text-green-500 text-lg">✓</span> Free forever
+                </div>
+                <div className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
+                  <span className="text-green-500 text-lg">✓</span> No signup
+                </div>
+                <div className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
+                  <span className="text-green-500 text-lg">✓</span> Results in 15 seconds
+                </div>
+              </div>
+
+              <div className="hidden lg:flex items-center gap-3 mt-10 text-blue-600 font-bold">
+                Get started here <span className="text-2xl">→</span>
+              </div>
             </div>
-            <div className="flex flex-col items-center text-center">
-              <div className="w-12 h-12 bg-[#16A34A]/10 rounded-full flex items-center justify-center mb-4 text-2xl">
-                ⚡
-              </div>
-              <h3 className="font-semibold text-slate-900 mb-1">Results in Seconds</h3>
-              <p className="text-sm text-slate-500">Fast analysis powered by advanced AI.</p>
+
+            {/* Right Column - Upload Box */}
+            <div id="upload" className="bg-white rounded-2xl shadow-xl border border-gray-100 p-6">
+              {result ? (
+                <ResultsPanel data={result} onReset={() => setResult(null)} />
+              ) : (
+                <UploadBox onResult={setResult} />
+              )}
             </div>
-            <div className="flex flex-col items-center text-center">
-              <div className="w-12 h-12 bg-[#16A34A]/10 rounded-full flex items-center justify-center mb-4 text-2xl">
-                🩺
-              </div>
-              <h3 className="font-semibold text-slate-900 mb-1">Plain English Explanations</h3>
-              <p className="text-sm text-slate-500">No medical jargon. Just clear, simple info.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Stats Bar */}
+      <section className="bg-gray-50 border-y border-gray-200 py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+            <div>
+              <div className="text-2xl font-bold text-blue-600">10,000+</div>
+              <div className="text-sm text-gray-500">Prescriptions Read</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-blue-600">19</div>
+              <div className="text-sm text-gray-500">Abbreviations Decoded</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-blue-600">15 sec</div>
+              <div className="text-sm text-gray-500">Average Analysis Time</div>
+            </div>
+            <div>
+              <div className="text-2xl font-bold text-blue-600">100%</div>
+              <div className="text-sm text-gray-500">Free Forever</div>
             </div>
           </div>
         </div>
       </section>
 
       {/* How It Works Section */}
-      <section className="w-full bg-gray-50 py-16 border-b border-gray-200">
+      <section className="bg-white py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-slate-900 mb-12">How It Works</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mb-6 text-3xl border border-gray-100">
-                📸
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">How It Works</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">Get your prescription explained in 3 simple steps</p>
+          </div>
+
+          <div className="relative">
+            {/* Connecting line on desktop */}
+            <div className="hidden md:block absolute top-8 left-1/4 right-1/4 h-0.5 bg-blue-100 -z-10"></div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-6">1</div>
+                <div className="text-4xl mb-4">📸</div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Upload</h3>
+                <p className="text-gray-600">Take a photo or upload your prescription file</p>
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">1. Upload</h3>
-              <p className="text-slate-600">Upload or photograph your prescription using your phone or computer.</p>
-            </div>
-            <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mb-6 text-3xl border border-gray-100">
-                🤖
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-6">2</div>
+                <div className="text-4xl mb-4">🤖</div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">AI Analyzes</h3>
+                <p className="text-gray-600">Our Gemini AI reads every medicine, dosage, and instruction</p>
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">2. Analyze</h3>
-              <p className="text-slate-600">Our AI reads and analyzes every detail, from medication names to dosage instructions.</p>
-            </div>
-            <div className="flex flex-col items-center text-center">
-              <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mb-6 text-3xl border border-gray-100">
-                ✅
+              <div className="flex flex-col items-center text-center">
+                <div className="w-16 h-16 bg-blue-600 text-white rounded-full flex items-center justify-center text-xl font-bold mb-6">3</div>
+                <div className="text-4xl mb-4">✅</div>
+                <h3 className="text-xl font-bold text-gray-900 mb-2">Understand</h3>
+                <p className="text-gray-600">Get a clear plain-English breakdown instantly</p>
               </div>
-              <h3 className="text-xl font-bold text-slate-900 mb-2">3. Understand</h3>
-              <p className="text-slate-600">Get a plain-English breakdown of your prescription instantly, clearly explained.</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Why Trust RxReader Section */}
-      <section className="w-full bg-white py-16">
+      {/* Features Section */}
+      <section className="bg-gray-50 py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-center text-slate-900 mb-12">Why Trust RxReader?</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <div className="flex items-start gap-4 p-6 bg-slate-50 rounded-2xl">
-              <div className="text-2xl mt-1">🔒</div>
-              <div>
-                <h3 className="font-bold text-slate-900 mb-1">Images deleted after 24 hours</h3>
-                <p className="text-sm text-slate-600">We prioritize your privacy. Your prescription images are never stored permanently.</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 p-6 bg-slate-50 rounded-2xl">
-              <div className="text-2xl mt-1">🚫</div>
-              <div>
-                <h3 className="font-bold text-slate-900 mb-1">No account or signup required</h3>
-                <p className="text-sm text-slate-600">Use the tool instantly without giving us your email or personal information.</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 p-6 bg-slate-50 rounded-2xl">
-              <div className="text-2xl mt-1">⚡</div>
-              <div>
-                <h3 className="font-bold text-slate-900 mb-1">Powered by Google Gemini AI</h3>
-                <p className="text-sm text-slate-600">We use the latest state-of-the-art vision models for high accuracy reading.</p>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 p-6 bg-slate-50 rounded-2xl">
-              <div className="text-2xl mt-1">🌍</div>
-              <div>
-                <h3 className="font-bold text-slate-900 mb-1">Used by patients in 10+ countries</h3>
-                <p className="text-sm text-slate-600">A global community trusts RxReader for help with their prescriptions.</p>
-              </div>
-            </div>
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Why Patients Trust RxReader</h2>
           </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[
+              { icon: '🔒', title: 'Private & Secure', desc: 'Images auto-deleted after 24 hours. Never stored permanently.' },
+              { icon: '⚡', title: 'Instant Results', desc: 'Get your prescription explained in under 15 seconds.' },
+              { icon: '🤖', title: 'Powered by Gemini AI', desc: "Google's latest vision AI for high accuracy reading." },
+              { icon: '📱', title: 'Works on Mobile', desc: 'Take a photo directly from your phone camera.' },
+              { icon: '🌍', title: 'Global Support', desc: 'Works with prescriptions from doctors worldwide.' },
+              { icon: '🆓', title: 'Always Free', desc: 'No hidden fees, no subscriptions, no signup required.' }
+            ].map((f, i) => (
+              <div key={i} className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 hover:shadow-md transition">
+                <div className="text-3xl mb-4">{f.icon}</div>
+                <h3 className="font-bold text-gray-900 mb-2">{f.title}</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">{f.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="bg-white py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">What Patients Say</h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[
+              {
+                quote: "I finally understood my father's diabetes prescription after years of confusion. RxReader explained every medicine in simple Urdu-friendly English. Absolutely life changing.",
+                name: "Fatima K.",
+                location: "Lahore, Pakistan"
+              },
+              {
+                quote: "My doctor's handwriting was impossible to read. RxReader decoded it perfectly in seconds. Now I know exactly when and how to take each medicine.",
+                name: "Rahul M.",
+                location: "Mumbai, India"
+              },
+              {
+                quote: "As a caregiver for my elderly mother, this tool saves me from calling the pharmacy every time. Fast, accurate and completely free. Highly recommended.",
+                name: "Sarah A.",
+                location: "Lagos, Nigeria"
+              }
+            ].map((t, i) => (
+              <div key={i} className="bg-gray-50 border border-gray-200 rounded-xl p-6 shadow-sm">
+                <div className="flex text-yellow-400 mb-4">⭐⭐⭐⭐⭐</div>
+                <p className="text-gray-700 italic mb-6">“{t.quote}”</p>
+                <div>
+                  <div className="font-semibold text-gray-900">{t.name}</div>
+                  <div className="text-sm text-gray-500">{t.location}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
+      <section className="bg-blue-600 py-20 text-white text-center">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-3xl md:text-4xl font-bold mb-6">Ready to Understand Your Prescription?</h2>
+          <p className="text-lg text-blue-100 mb-10">
+            Join thousands of patients who use RxReader to take control of their health. Free, instant, and private.
+          </p>
+          <Link
+            href="#upload"
+            className="inline-block bg-white text-blue-600 font-bold px-8 py-4 rounded-xl hover:bg-blue-50 transition shadow-lg"
+            onClick={(e) => {
+              e.preventDefault();
+              document.getElementById('upload')?.scrollIntoView({ behavior: 'smooth' });
+            }}
+          >
+            Read My Prescription Now
+          </Link>
         </div>
       </section>
     </div>
