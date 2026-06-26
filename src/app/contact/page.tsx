@@ -1,44 +1,33 @@
-import { Metadata } from "next";
+import { Metadata } from 'next';
+import { Mail } from 'lucide-react';
+
+export const dynamic = "force-static";
 
 export const metadata: Metadata = {
   title: "Contact Us — RxReader",
-  description: "Have a question or feedback about RxReader? Get in touch with our team.",
 };
 
 export default function ContactPage() {
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12">
-      <h1 className="text-4xl font-extrabold text-gray-900 mb-8">Contact Us — RxReader</h1>
+    <div className="max-w-3xl mx-auto px-4 py-12 prose prose-slate">
+      <h1 className="text-3xl font-bold mb-8">Contact Us</h1>
 
-      <div className="space-y-8 leading-relaxed text-gray-700">
-        <p className="text-lg">
-          We&apos;d love to hear from you — whether it&apos;s a bug report, feedback, or a general question about the platform.
+      <p>
+        Have questions, feedback, or need assistance? We&apos;re here to help. Reach out to us via email and we&apos;ll get back to you as soon as possible.
+      </p>
+
+      <div className="not-prose mt-12">
+        <a
+          href="mailto:contact@rxreader.com"
+          className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 inline-block font-medium flex items-center gap-2 w-fit"
+        >
+          <Mail className="w-5 h-5" />
+          Email Us
+        </a>
+
+        <p className="mt-6 text-sm text-slate-500">
+          Response time: We typically respond within 24-48 hours.
         </p>
-
-        <div className="py-6">
-          <a
-            href="mailto:contact@rxreader.com"
-            className="inline-block bg-blue-600 text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-blue-700 transition-colors shadow-sm"
-          >
-            Email Us: contact@rxreader.com
-          </a>
-        </div>
-
-        <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 space-y-4">
-          <div>
-            <h3 className="font-bold text-gray-900">Medical Questions</h3>
-            <p className="text-sm">
-              For medical questions, please consult your doctor or pharmacist — we are not able to provide medical advice or interpretation of your specific health situation.
-            </p>
-          </div>
-
-          <div>
-            <h3 className="font-bold text-gray-900">Response Time</h3>
-            <p className="text-sm">
-              We are a small team, but we aim to respond to all inquiries within 2–3 business days.
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );

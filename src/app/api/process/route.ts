@@ -10,6 +10,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'missing_params' }, { status: 400 });
     }
 
+    // 0. Check if storage bucket exists
+    const { data: buckets } = await supabaseServer.storage.listBuckets();
+    const bucketExists = buckets?.some(b => b.name === 'prescription-images');
+    if (!bucketExists) {
+      return NextResponse.json(
+        { error: 'storage_not_configured' },
+        { status: 500 }
+      );
+    }
+
     // 1. Download image from Supabase Storage
     const { data, error: downloadError } = await supabaseServer.storage
       .from('prescription-images')

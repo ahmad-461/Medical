@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import Link from "next/link";
+import Nav from "@/components/Nav";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -18,18 +19,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.className} bg-white text-slate-900 antialiased min-h-screen flex flex-col`}>
-        <header className="border-b border-slate-100 sticky top-0 bg-white/80 backdrop-blur-sm z-50">
-          <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            <Link href="/" className="text-2xl font-bold text-[#2563EB]">
-              RxReader
-            </Link>
-            <div className="flex items-center">
-              <button disabled className="text-sm font-medium text-slate-500 opacity-50 cursor-not-allowed">
-                More Tools
-              </button>
-            </div>
-          </nav>
-        </header>
+        <Nav />
 
         <main className="flex-grow pt-8 sm:pt-12">
           {children}
@@ -47,6 +37,8 @@ export default function RootLayout({
                 <Link href="/privacy-policy" className="text-gray-500 hover:text-gray-700 text-sm transition-colors">Privacy Policy</Link>
                 <Link href="/disclaimer" className="text-gray-500 hover:text-gray-700 text-sm transition-colors">Disclaimer</Link>
                 <Link href="/contact" className="text-gray-500 hover:text-gray-700 text-sm transition-colors">Contact</Link>
+                <Link href="/prescription-abbreviations" className="text-gray-500 hover:text-gray-700 text-sm transition-colors">Abbreviations</Link>
+                <Link href="/faq" className="text-gray-500 hover:text-gray-700 text-sm transition-colors">FAQ</Link>
               </div>
             </div>
           </div>
