@@ -1,0 +1,34 @@
+
+> tmp-app@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+  - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1708ms
+ ○ Compiling / ...
+ ✓ Compiled / in 10.9s (1156 modules)
+ GET / 200 in 11752ms
+ ✓ Compiled in 906ms (533 modules)
+ ○ Compiling /faq ...
+ ✓ Compiled /faq in 3.5s (1146 modules)
+ ✓ Compiled /how-to-read-a-prescription in 281ms (1150 modules)
+ GET /how-to-read-a-prescription 200 in 392ms
+ ✓ Compiled /prescription-abbreviations in 292ms (1153 modules)
+ GET /prescription-abbreviations 200 in 368ms
+ ✓ Compiled /prescription-abbreviations/[slug] in 376ms (1160 modules)
+ ✓ Compiled /disclaimer in 284ms (1164 modules)
+ GET /disclaimer 200 in 406ms
+ ○ Compiling /contact ...
+ ✓ Compiled /contact in 1168ms (1176 modules)
+ GET /contact 200 in 1309ms
+ GET / 200 in 159ms
+ GET / 200 in 48ms
+ GET / 200 in 42ms
+ GET /how-to-read-a-prescription 200 in 75ms
+ GET /prescription-abbreviations 200 in 53ms
+ GET /disclaimer 200 in 73ms
+ GET /contact 200 in 40ms
+ GET / 200 in 34ms

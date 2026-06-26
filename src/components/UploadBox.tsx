@@ -138,6 +138,8 @@ export default function UploadBox() {
           setError("This doesn't look like a prescription. Please upload a clear photo of a doctor's prescription.");
         } else if (result.error === 'unreadable') {
           setError("We couldn't read this prescription clearly. Try a better-lit photo or a higher quality image.");
+        } else if (result.error === 'storage_not_configured') {
+          setError("Service temporarily unavailable. Please try again later.");
         } else {
           setError("Something went wrong while analyzing. Please try again.");
         }
