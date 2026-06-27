@@ -1,0 +1,27 @@
+
+> tmp-app@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+  - Environments: .env.local
+
+ ✓ Starting...
+ ✓ Ready in 1848ms
+ ○ Compiling / ...
+ ✓ Compiled / in 8.9s (1164 modules)
+ GET / 200 in 9571ms
+ ✓ Compiled in 888ms (537 modules)
+ ○ Compiling /drug-interaction-checker ...
+ ✓ Compiled /drug-interaction-checker in 987ms (826 modules)
+ GET /drug-interaction-checker 200 in 1282ms
+ ✓ Compiled in 387ms (840 modules)
+ GET /drug-interaction-checker 200 in 69ms
+ ✓ Compiled /api/check-interactions in 502ms (328 modules)
+[interactions] fatal: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [401 Unauthorized] Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project. [{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"ACCESS_TOKEN_TYPE_UNSUPPORTED","metadata":{"method":"google.ai.generativelanguage.v1beta.GenerativeService.GenerateContent","service":"generativelanguage.googleapis.com"}}]
+ POST /api/check-interactions 500 in 665ms
+ GET /drug-interaction-checker 200 in 155ms
+[interactions] fatal: [GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent: [401 Unauthorized] Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project. [{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"ACCESS_TOKEN_TYPE_UNSUPPORTED","metadata":{"method":"google.ai.generativelanguage.v1beta.GenerativeService.GenerateContent","service":"generativelanguage.googleapis.com"}}]
+ POST /api/check-interactions 500 in 65ms
+ ✓ Compiled / in 338ms (654 modules)
+ GET / 200 in 667ms
