@@ -8,18 +8,18 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
-      <h1 className="text-4xl font-extrabold text-gray-900 mb-8">About RxReader — Free AI Prescription Reader</h1>
+      <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-8">About RxReader — Free AI Prescription Reader</h1>
 
-      <div className="space-y-12 leading-relaxed text-gray-700">
+      <div className="space-y-12 leading-relaxed text-gray-700 dark:text-gray-300">
         <section>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Our Mission</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Our Mission</h2>
           <p>
             RxReader was created to help patients, especially those in underserved regions, understand their prescriptions more clearly. We believe that everyone should have access to basic information about their medication without necessarily needing to call a doctor or pharmacist for every simple question. Our goal is to empower patients with knowledge and clarity.
           </p>
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">How It Works</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">How It Works</h2>
           <div className="space-y-4">
             <p>Our process is designed to be as simple and fast as possible:</p>
             <ol className="list-decimal pl-5 space-y-2">
@@ -31,7 +31,7 @@ export default function AboutPage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Our Commitment to Privacy</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Our Commitment to Privacy</h2>
           <p>
             Your privacy and data security are our top priorities. We understand the sensitive nature of medical prescriptions.
           </p>
@@ -44,14 +44,14 @@ export default function AboutPage() {
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Important Disclaimer</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Important Disclaimer</h2>
           <p className="font-medium">
             RxReader is for informational purposes only. It is not a medical device and should not be used as a substitute for professional medical advice, diagnosis, or treatment. Always consult with a licensed doctor or pharmacist before making any decisions related to your medication.
           </p>
         </section>
 
         <section>
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Technology</h2>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">Technology</h2>
           <p>
             RxReader is built using modern, reliable technologies to ensure a fast and secure experience:
           </p>

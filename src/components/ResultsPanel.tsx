@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import { PrescriptionResult, Medicine } from '@/types/prescription';
 import { generatePDF } from '@/lib/generatePDF';
-import PDFExportWrapper from '@/components/PDFExportWrapper';
 import Spinner from '@/components/Spinner';
 
 interface ResultsPanelProps {
@@ -18,12 +17,20 @@ export default function ResultsPanel({ data, onReset }: ResultsPanelProps) {
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
 
   const handleDownloadPDF = async () => {
+    // Show PDF header temporarily
+    const header = document.getElementById('pdf-header');
+    if (header) header.classList.remove('hidden');
+
     setIsGeneratingPDF(true);
-    // Use a small timeout to ensure the state change and re-render have finished
-    setTimeout(async () => {
+    try {
       await generatePDF('pdf-export-area', 'RxReader-Prescription.pdf');
-      setIsGeneratingPDF(false);
-    }, 100);
+    } catch (e) {
+      console.error('PDF error:', e);
+    }
+    setIsGeneratingPDF(false);
+
+    // Hide header again
+    if (header) header.classList.add('hidden');
   };
 
   const handleEdit = (index: number) => {
@@ -106,8 +113,14 @@ export default function ResultsPanel({ data, onReset }: ResultsPanelProps) {
 
   return (
     <div className="w-full max-w-2xl mx-auto space-y-6 print-area pb-12">
-      <PDFExportWrapper isGenerating={isGeneratingPDF}>
-        <div className="space-y-6">
+      <div id="pdf-export-area" className="space-y-6 bg-white dark:bg-gray-900">
+          {/* PDF Header */}
+          <div id="pdf-header" className="hidden mb-6 pb-4 border-b border-gray-200">
+            <h1 className="text-2xl font-bold text-blue-600">💊 RxReader</h1>
+            <p className="text-sm text-gray-500">AI Prescription Reader — For informational purposes only</p>
+            <p className="text-sm text-gray-500">Generated: {new Date().toLocaleDateString()}</p>
+          </div>
+
           {/* Safety Disclaimer */}
           <div className="bg-amber-50 border border-amber-300 rounded-lg p-4 flex gap-3">
             <span className="text-xl shrink-0">⚠️</span>
@@ -124,7 +137,7 @@ export default function ResultsPanel({ data, onReset }: ResultsPanelProps) {
           {/* Medicine Cards */}
           <div className="space-y-4">
             {medicines.map((med, index) => (
-              <div key={index} className="bg-white border border-gray-200 rounded-xl shadow-sm p-4 space-y-3">
+              <div key={index} className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-4 space-y-3">
                 {editingIndex === index ? (
                   <div className="space-y-3">
                     <div>
@@ -132,7 +145,7 @@ export default function ResultsPanel({ data, onReset }: ResultsPanelProps) {
                       <input
                         id={`name-${index}`}
                         type="text"
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-900 font-bold focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-900 dark:text-white bg-white dark:bg-gray-900 font-bold focus:ring-2 focus:ring-blue-500 outline-none"
                         value={editValues?.name}
                         onChange={(e) => handleChange(e, 'name')}
                       />
@@ -142,7 +155,7 @@ export default function ResultsPanel({ data, onReset }: ResultsPanelProps) {
                       <input
                         id={`dosage-${index}`}
                         type="text"
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 outline-none"
                         value={editValues?.dosage}
                         onChange={(e) => handleChange(e, 'dosage')}
                       />
@@ -152,7 +165,7 @@ export default function ResultsPanel({ data, onReset }: ResultsPanelProps) {
                       <input
                         id={`frequency-${index}`}
                         type="text"
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 outline-none"
                         value={editValues?.frequency_plain}
                         onChange={(e) => handleChange(e, 'frequency_plain')}
                       />
@@ -162,7 +175,7 @@ export default function ResultsPanel({ data, onReset }: ResultsPanelProps) {
                       <input
                         id={`duration-${index}`}
                         type="text"
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 outline-none"
                         value={editValues?.duration}
                         onChange={(e) => handleChange(e, 'duration')}
                       />
@@ -171,7 +184,7 @@ export default function ResultsPanel({ data, onReset }: ResultsPanelProps) {
                       <label htmlFor={`instructions-${index}`} className="block text-xs font-semibold text-gray-400 uppercase tracking-wider mb-1">Instructions</label>
                       <textarea
                         id={`instructions-${index}`}
-                        className="w-full border border-gray-300 rounded-md px-3 py-2 text-gray-600 focus:ring-2 focus:ring-blue-500 outline-none"
+                        className="w-full border border-gray-300 dark:border-gray-600 rounded-md px-3 py-2 text-gray-600 dark:text-gray-300 bg-white dark:bg-gray-900 focus:ring-2 focus:ring-blue-500 outline-none"
                         value={editValues?.instructions}
                         onChange={(e) => handleChange(e, 'instructions')}
                         rows={2}
@@ -189,7 +202,7 @@ export default function ResultsPanel({ data, onReset }: ResultsPanelProps) {
                   <>
                     <div className="flex justify-between items-start gap-4">
                       <div>
-                        <h3 className="text-xl font-bold text-gray-900">{med.name}</h3>
+                        <h3 className="text-xl font-bold text-gray-900 dark:text-white">{med.name}</h3>
                         {renderCardConfidence(med.confidence)}
                       </div>
                       <button
@@ -203,23 +216,23 @@ export default function ResultsPanel({ data, onReset }: ResultsPanelProps) {
 
                     <div className="grid gap-2 text-sm">
                       <div className="flex gap-2">
-                        <span className="font-semibold text-gray-700">Dosage:</span>
-                        <span className="text-gray-600">{med.dosage}</span>
+                        <span className="font-semibold text-gray-700 dark:text-gray-300">Dosage:</span>
+                        <span className="text-gray-600 dark:text-gray-400">{med.dosage}</span>
                       </div>
                       <div className="flex flex-col sm:flex-row sm:gap-2">
-                        <span className="font-semibold text-gray-700">Frequency:</span>
-                        <span className="text-gray-600">
-                          {med.frequency_plain} <span className="text-gray-400 text-xs">({med.frequency_code})</span>
+                        <span className="font-semibold text-gray-700 dark:text-gray-300">Frequency:</span>
+                        <span className="text-gray-600 dark:text-gray-400">
+                          {med.frequency_plain} <span className="text-gray-400 dark:text-gray-500 text-xs">({med.frequency_code})</span>
                         </span>
                       </div>
                       <div className="flex gap-2">
-                        <span className="font-semibold text-gray-700">Duration:</span>
-                        <span className="text-gray-600">{med.duration}</span>
+                        <span className="font-semibold text-gray-700 dark:text-gray-300">Duration:</span>
+                        <span className="text-gray-600 dark:text-gray-400">{med.duration}</span>
                       </div>
                       {med.instructions && (
                         <div className="flex gap-2">
-                          <span className="font-semibold text-gray-700">Instructions:</span>
-                          <span className="text-gray-600">{med.instructions}</span>
+                          <span className="font-semibold text-gray-700 dark:text-gray-300">Instructions:</span>
+                          <span className="text-gray-600 dark:text-gray-400">{med.instructions}</span>
                         </div>
                       )}
                     </div>
@@ -232,8 +245,8 @@ export default function ResultsPanel({ data, onReset }: ResultsPanelProps) {
           {/* Doctor&apos;s Notes */}
           {data.doctor_notes && (
             <div className="space-y-2">
-              <h4 className="font-bold text-gray-900 px-1">Doctor&apos;s Notes</h4>
-              <div className="bg-gray-50 rounded-lg p-3 text-gray-700 text-sm">
+              <h4 className="font-bold text-gray-900 dark:text-white px-1">Doctor&apos;s Notes</h4>
+              <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-3 text-gray-700 dark:text-gray-300 text-sm">
                 {data.doctor_notes}
               </div>
             </div>
@@ -242,16 +255,15 @@ export default function ResultsPanel({ data, onReset }: ResultsPanelProps) {
           {/* Unreadable Fields */}
           {data.unreadable_fields && data.unreadable_fields.length > 0 && (
             <div className="space-y-2">
-              <h4 className="font-bold text-red-600 px-1">Could Not Read</h4>
-              <ul className="list-disc list-inside text-sm text-gray-600 space-y-1">
+              <h4 className="font-bold text-red-600 dark:text-red-400 px-1">Could Not Read</h4>
+              <ul className="list-disc list-inside text-sm text-gray-600 dark:text-gray-400 space-y-1">
                 {data.unreadable_fields.map((field, idx) => (
                   <li key={idx}>{field}</li>
                 ))}
               </ul>
             </div>
           )}
-        </div>
-      </PDFExportWrapper>
+      </div>
 
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-3 pt-4 no-print">
@@ -259,7 +271,7 @@ export default function ResultsPanel({ data, onReset }: ResultsPanelProps) {
           onClick={handleDownloadPDF}
           disabled={isGeneratingPDF}
           aria-label={isGeneratingPDF ? "Generating PDF document" : "Download prescription as PDF"}
-          className="flex-1 px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-full font-bold hover:bg-gray-50 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="flex-1 px-6 py-3 bg-green-600 text-white rounded-full font-bold hover:bg-green-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isGeneratingPDF ? (
             <>

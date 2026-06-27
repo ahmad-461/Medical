@@ -8,8 +8,8 @@ export const metadata: Metadata = {
 
 export default function DisclaimerPage() {
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12 prose prose-slate">
-      <h1 className="text-3xl font-bold mb-8">Medical Disclaimer</h1>
+    <div className="max-w-3xl mx-auto px-4 py-12 prose prose-slate dark:prose-invert">
+      <h1 className="text-3xl font-bold mb-8 dark:text-white">Medical Disclaimer</h1>
 
       <div className="space-y-6">
         <p className="font-bold">
@@ -29,7 +29,7 @@ export default function DisclaimerPage() {
         </p>
       </div>
 
-      <div className="mt-12 text-sm text-slate-500">
+      <div className="mt-12 text-sm text-slate-500 dark:text-gray-400">
         <p>
           The information provided by RxReader is for informational purposes only. We strive for accuracy but cannot guarantee it. Use of this application constitutes acceptance of this disclaimer.
         </p>
