@@ -132,31 +132,30 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
       // Start Analysis
       setStep('analyzing');
 
-      const response = await fetch('/api/process', {
+      const res = await fetch('/api/process', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ session_id: sessionId, file_path: filePath }),
       });
 
-      const result = await response.json();
+      const data = await res.json();
+      console.log('[upload] response:', data);
 
-      if (!response.ok) {
-        if (result.error === 'not_a_prescription') {
-          setError("This doesn't look like a prescription. Please upload a clear photo of a doctor's prescription.");
-        } else if (result.error === 'unreadable') {
-          setError("We couldn't read this prescription clearly. Try a better-lit photo or a higher quality image.");
-        } else if (result.error === 'storage_not_configured') {
-          setError("Service temporarily unavailable. Please try again later.");
-        } else {
-          setError("Something went wrong while analyzing. Please try again.");
-        }
+      if (!res.ok || data.error) {
+        const messages: Record<string, string> = {
+          not_a_prescription: "This doesn't look like a prescription. Please upload a clear photo of a doctor's prescription.",
+          unreadable: "We couldn't read this image clearly. Try a better-lit, higher quality photo.",
+          download_failed: "Failed to retrieve your image. Please upload again.",
+          parse_failed: "AI returned an unexpected response. Please try again.",
+          missing_params: "Upload error — please refresh and try again.",
+        };
+        setError(messages[data.error] || `Error: ${data.message || data.error}. Please try again.`);
         setStep('idle');
         return;
       }
 
-      console.log('Analysis result:', result);
       setStep('done');
-      onResult(result);
+      onResult(data);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to upload prescription. Please try again.';
       setError(errorMessage);
@@ -178,7 +177,7 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
 
       {step === 'idle' && (
         <div
-          className="border-2 border-dashed border-slate-300 rounded-2xl p-12 bg-slate-50 flex flex-col items-center justify-center transition-colors hover:border-[#2563EB] group cursor-pointer"
+          className="border-2 border-dashed border-slate-300 dark:border-gray-600 rounded-2xl p-12 bg-white dark:bg-gray-800 flex flex-col items-center justify-center transition-colors hover:border-[#2563EB] group cursor-pointer"
           onClick={triggerUpload}
           onDragOver={(e) => e.preventDefault()}
           onDrop={(e) => {
@@ -193,13 +192,13 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
             }
           }}
         >
-          <div className="w-16 h-16 bg-white rounded-full shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+          <div className="w-16 h-16 bg-white dark:bg-gray-700 rounded-full shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
             <span className="text-3xl">📄</span>
           </div>
-          <p className="text-slate-600 font-medium text-center">
+          <p className="text-gray-600 dark:text-gray-400 font-medium text-center">
             Drop your prescription here or click to upload
           </p>
-          <p className="text-slate-400 text-xs mt-2">
+          <p className="text-slate-400 dark:text-gray-500 text-xs mt-2">
             Supports JPG, PNG, HEIC, PDF (Max 10MB)
           </p>
 
@@ -217,14 +216,14 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
       )}
 
       {step === 'compressing' && (
-        <div className="bg-slate-50 rounded-2xl p-12 flex flex-col items-center justify-center border border-slate-200">
+        <div className="bg-slate-50 dark:bg-gray-800 rounded-2xl p-12 flex flex-col items-center justify-center border border-slate-200 dark:border-gray-700">
           <Spinner size="lg" />
-          <p className="mt-4 text-slate-600 font-medium">Preparing image...</p>
+          <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">Preparing image...</p>
         </div>
       )}
 
       {step === 'crop' && imageSrc && (
-        <div className="bg-slate-50 rounded-2xl overflow-hidden border border-slate-200">
+        <div className="bg-slate-50 dark:bg-gray-800 rounded-2xl overflow-hidden border border-slate-200 dark:border-gray-700">
           <div className="relative h-80 w-full bg-slate-900">
             <Cropper
               image={imageSrc}
@@ -254,8 +253,8 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
       )}
 
       {step === 'confirm' && (
-        <div className="bg-slate-50 rounded-2xl overflow-hidden border border-slate-200">
-          <div className="p-8 flex flex-col items-center justify-center bg-slate-100 border-b border-slate-200">
+        <div className="bg-slate-50 dark:bg-gray-800 rounded-2xl overflow-hidden border border-slate-200 dark:border-gray-700">
+          <div className="p-8 flex flex-col items-center justify-center bg-slate-100 dark:bg-gray-900 border-b border-slate-200 dark:border-gray-700">
             {selectedFile?.type === 'application/pdf' ? (
               <div className="flex flex-col items-center">
                 <span className="text-6xl mb-4">📄</span>
@@ -289,9 +288,9 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
       )}
 
       {(step === 'uploading' || step === 'analyzing') && (
-        <div className="bg-slate-50 rounded-2xl p-12 flex flex-col items-center justify-center border border-slate-200">
+        <div className="bg-slate-50 dark:bg-gray-800 rounded-2xl p-12 flex flex-col items-center justify-center border border-slate-200 dark:border-gray-700">
           <Spinner size="lg" />
-          <p className="mt-4 text-slate-600 font-medium">
+          <p className="mt-4 text-gray-600 dark:text-gray-400 font-medium">
             {step === 'uploading' ? 'Uploading...' : 'Analyzing your prescription...'}
           </p>
         </div>

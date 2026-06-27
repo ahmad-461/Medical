@@ -1,84 +1,78 @@
 'use client';
-
-import React, { useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { useState } from 'react';
+import Link from 'next/link';
+import { Menu, X, Sun, Moon } from 'lucide-react';
+import { useTheme } from '@/components/ThemeProvider';
 
 export default function Header() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const closeMenu = () => setMobileMenuOpen(false);
+  const [open, setOpen] = useState(false);
+  const { isDark, toggle } = useTheme();
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+    <header className="sticky top-0 z-50 bg-gradient-to-r from-blue-700 via-blue-600 to-blue-500 shadow-lg">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
+
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <span className="text-2xl">💊</span>
-            <span className="text-xl font-bold text-blue-600">RxReader</span>
-            <span className="hidden sm:inline-block text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full font-medium ml-1">FREE</span>
-          </a>
+            <span className="text-xl font-bold text-white">RxReader</span>
+            <span className="hidden sm:inline-block text-xs bg-white/20 text-white px-2 py-0.5 rounded-full font-medium ml-1 border border-white/30">FREE</span>
+          </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-6">
-            <a href="/prescription-abbreviations" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">Abbreviations</a>
-            <a href="/how-to-read-a-prescription" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">How to Read</a>
-            <a href="/faq" className="text-sm font-medium text-gray-600 hover:text-blue-600 transition-colors">FAQ</a>
-            <span className="relative group text-sm font-medium text-gray-400 cursor-not-allowed">
-              More Tools
-              <span className="absolute -top-9 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap">
+          <nav className="hidden md:flex items-center gap-1">
+            <Link href="/prescription-abbreviations" className="text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-colors">Abbreviations</Link>
+            <Link href="/how-to-read-a-prescription" className="text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-colors">How to Read</Link>
+            <Link href="/faq" className="text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-colors">FAQ</Link>
+            <span className="relative group cursor-not-allowed px-3 py-2">
+              <span className="text-sm font-medium text-blue-300">More Tools</span>
+              <span className="absolute -bottom-9 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition whitespace-nowrap z-50">
                 Coming Soon
               </span>
             </span>
-            <a href="/#upload" className="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
+            <button
+              onClick={toggle}
+              className="p-2 rounded-lg text-blue-100 hover:text-white hover:bg-white/10 transition-colors ml-1"
+              aria-label="Toggle dark mode"
+            >
+              {isDark ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+            <Link href="/#upload" className="ml-2 bg-white text-blue-600 text-sm font-bold px-5 py-2 rounded-lg hover:bg-blue-50 transition-colors shadow-md">
               Read Prescription
-            </a>
+            </Link>
           </nav>
 
-          {/* Mobile hamburger */}
-          <button
-            className="md:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label="Toggle menu"
-          >
-            {mobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
-          </button>
+          {/* Mobile right side */}
+          <div className="md:hidden flex items-center gap-2">
+            <button onClick={toggle} className="p-2 rounded-lg text-blue-100 hover:bg-white/10" aria-label="Toggle dark mode">
+              {isDark ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+            <button
+              className="p-2 rounded-lg text-white hover:bg-white/10 transition-colors"
+              onClick={() => setOpen(!open)}
+              aria-label="Toggle menu"
+            >
+              {open ? <X size={22} /> : <Menu size={22} />}
+            </button>
+          </div>
         </div>
 
         {/* Mobile Menu */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t border-gray-100 py-4 flex flex-col gap-4 px-2">
-            <a
-              href="/prescription-abbreviations"
-              className="text-sm font-medium text-gray-700 hover:text-blue-600"
-              onClick={closeMenu}
-            >
-              Abbreviations
-            </a>
-            <a
-              href="/how-to-read-a-prescription"
-              className="text-sm font-medium text-gray-700 hover:text-blue-600"
-              onClick={closeMenu}
-            >
-              How to Read
-            </a>
-            <a
-              href="/faq"
-              className="text-sm font-medium text-gray-700 hover:text-blue-600"
-              onClick={closeMenu}
-            >
-              FAQ
-            </a>
-            <span className="text-sm text-gray-400">
-              More Tools <span className="text-xs bg-gray-100 px-2 py-0.5 rounded-full">Coming Soon</span>
+        {open && (
+          <div className="md:hidden border-t border-blue-500 py-3 flex flex-col gap-1 pb-4">
+            <Link href="/prescription-abbreviations" onClick={() => setOpen(false)} className="px-3 py-2.5 text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 rounded-lg transition-colors">📖 Abbreviations</Link>
+            <Link href="/how-to-read-a-prescription" onClick={() => setOpen(false)} className="px-3 py-2.5 text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 rounded-lg transition-colors">📋 How to Read</Link>
+            <Link href="/faq" onClick={() => setOpen(false)} className="px-3 py-2.5 text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 rounded-lg transition-colors">❓ FAQ</Link>
+            <span className="px-3 py-2 text-sm text-blue-300 flex items-center gap-2">
+              🔧 More Tools
+              <span className="text-xs bg-white/20 text-white px-2 py-0.5 rounded-full">Coming Soon</span>
             </span>
-            <a
-              href="/#upload"
-              className="bg-blue-600 text-white text-sm font-medium px-4 py-2 rounded-lg text-center hover:bg-blue-700"
-              onClick={closeMenu}
-            >
-              Read Prescription
-            </a>
+            <div className="px-3 pt-2">
+              <Link href="/#upload" onClick={() => setOpen(false)} className="block bg-white text-blue-600 text-sm font-bold px-4 py-2.5 rounded-lg text-center hover:bg-blue-50 transition-colors">
+                💊 Read Prescription
+              </Link>
+            </div>
           </div>
         )}
       </div>

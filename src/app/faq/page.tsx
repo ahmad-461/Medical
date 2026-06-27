@@ -56,9 +56,9 @@ export default function FAQPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12 prose prose-slate">
+    <div className="max-w-3xl mx-auto px-4 py-12 prose prose-slate dark:prose-invert">
       <JsonLd data={jsonLdData} />
-      <h1 className="text-3xl font-bold mb-8">Frequently Asked Questions</h1>
+      <h1 className="text-3xl font-bold mb-8 dark:text-white">Frequently Asked Questions</h1>
 
       <div className="space-y-4 not-prose">
         {faqs.map((faq, index) => (

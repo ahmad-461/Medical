@@ -22,9 +22,9 @@ export default function HowToReadPage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12 prose prose-slate">
+    <div className="max-w-3xl mx-auto px-4 py-12 prose prose-slate dark:prose-invert">
       <JsonLd data={jsonLdData} />
-      <h1 className="text-3xl font-bold mb-8">How to Read a Doctor&apos;s Prescription — Step by Step Guide</h1>
+      <h1 className="text-3xl font-bold mb-8 dark:text-white">How to Read a Doctor&apos;s Prescription — Step by Step Guide</h1>
 
       <h2>1. What is a Prescription?</h2>
       <p>

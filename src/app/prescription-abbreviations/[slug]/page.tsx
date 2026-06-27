@@ -26,34 +26,34 @@ export default function AbbreviationDetailPage({ params }: Props) {
   const relatedAbbrs = abbreviations.filter(a => abbr.related.includes(a.slug));
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-12 prose prose-slate">
+    <div className="max-w-3xl mx-auto px-4 py-12 prose prose-slate dark:prose-invert">
       <nav className="mb-8 not-prose">
-        <Link href="/prescription-abbreviations" className="text-sm text-[#2563EB] hover:underline flex items-center gap-1">
+        <Link href="/prescription-abbreviations" className="text-sm text-[#2563EB] dark:text-blue-400 hover:underline flex items-center gap-1">
           ← Back to Abbreviations
         </Link>
       </nav>
 
-      <div className="bg-blue-50 rounded-2xl p-8 mb-8 not-prose">
-        <h1 className="text-4xl font-extrabold text-[#2563EB] mb-2 m-0">{abbr.code}</h1>
-        <p className="text-xl font-semibold text-slate-700 m-0">{abbr.full_form}</p>
+      <div className="bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-8 mb-8 not-prose">
+        <h1 className="text-4xl font-extrabold text-[#2563EB] dark:text-blue-400 mb-2 m-0">{abbr.code}</h1>
+        <p className="text-xl font-semibold text-slate-700 dark:text-gray-300 m-0">{abbr.full_form}</p>
       </div>
 
-      <h2>Plain English Meaning</h2>
-      <p>{abbr.plain_english}</p>
+      <h2 className="dark:text-white">Plain English Meaning</h2>
+      <p className="dark:text-gray-300">{abbr.plain_english}</p>
 
-      <h2>Example on a Prescription</h2>
-      <div className="bg-slate-50 border-l-4 border-slate-300 p-4 italic">
+      <h2 className="dark:text-white">Example on a Prescription</h2>
+      <div className="bg-slate-50 dark:bg-gray-800 border-l-4 border-slate-300 dark:border-gray-600 p-4 italic dark:text-gray-300">
         {abbr.example}
       </div>
 
       <div className="mt-12 not-prose">
-        <h3 className="text-lg font-bold mb-4">Related Abbreviations</h3>
+        <h3 className="text-lg font-bold mb-4 dark:text-white">Related Abbreviations</h3>
         <div className="flex flex-wrap gap-2">
           {relatedAbbrs.map((related) => (
             <Link
               key={related.slug}
               href={`/prescription-abbreviations/${related.slug}`}
-              className="bg-white border border-gray-200 rounded-lg px-4 py-2 text-sm font-medium text-slate-700 hover:border-[#2563EB] hover:text-[#2563EB] transition-colors shadow-sm"
+              className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-4 py-2 text-sm font-medium text-slate-700 dark:text-gray-300 hover:border-[#2563EB] dark:hover:border-blue-400 hover:text-[#2563EB] dark:hover:text-blue-400 transition-colors shadow-sm"
             >
               {related.code}
             </Link>

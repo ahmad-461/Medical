@@ -1,42 +1,44 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-const genAI = new GoogleGenerativeAI(
-  process.env.GEMINI_API_KEY ?? 'placeholder-key'
-);
+export async function extractPrescriptionData(
+  imageBase64: string,
+  mimeType: string
+): Promise<string> {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
 
-export async function extractPrescriptionData(imageBase64: string, mimeType: string): Promise<string> {
+  const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
-  const result = await model.generateContent([
-    {
-      inlineData: {
-        mimeType,
-        data: imageBase64
-      }
-    },
-    {
-      text: `You are a medical prescription reader assistant. Analyze this prescription image or document and extract the following information. Return ONLY a valid JSON object with no markdown, no explanation, no backticks.
 
-Return this exact structure:
+  const prompt = `You are a medical prescription reader. Analyze this prescription image and extract all medicine information. Return ONLY valid JSON with no markdown, no backticks, no code fences, no explanation.
+
+Return exactly this JSON structure:
 {
   "medicines": [
     {
-      "name": "medicine name as written",
-      "dosage": "dosage/strength as written",
-      "frequency_code": "e.g. BD, OD, TDS",
-      "frequency_plain": "plain English explanation of frequency",
-      "duration": "e.g. 7 days, 1 month",
-      "instructions": "any special instructions e.g. after meals",
-      "confidence": "high | medium | low"
+      "name": "medicine name",
+      "dosage": "dosage or strength",
+      "frequency_code": "BD or OD or TDS etc",
+      "frequency_plain": "plain English frequency",
+      "duration": "e.g. 7 days",
+      "instructions": "e.g. after meals or empty string",
+      "confidence": "high"
     }
   ],
-  "doctor_notes": "any general notes or instructions not tied to a specific medicine",
-  "overall_confidence": "high | medium | low",
-  "unreadable_fields": ["list any fields that could not be read clearly"]
+  "doctor_notes": "general notes or empty string",
+  "overall_confidence": "high",
+  "unreadable_fields": []
 }
 
-If this image is not a prescription or is completely unreadable, return:
-{ "error": "not_a_prescription" } or { "error": "unreadable" }`
-    }
+If not a prescription return: {"error":"not_a_prescription"}
+If unreadable return: {"error":"unreadable"}`;
+
+  const result = await model.generateContent([
+    { inlineData: { mimeType, data: imageBase64 } },
+    { text: prompt },
   ]);
-  return result.response.text();
+
+  const text = result.response.text();
+  console.log('[gemini] raw response:', text);
+  return text;
 }

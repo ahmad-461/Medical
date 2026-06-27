@@ -8,53 +8,67 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: Request) {
   try {
     const { session_id, file_path } = await req.json();
-    console.log('[process] received:', { session_id, file_path });
+    console.log('[process] start:', { session_id, file_path });
+    console.log('[process] env:', {
+      hasGemini: !!process.env.GEMINI_API_KEY,
+      hasSupabase: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
+      hasService: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
+    });
 
-    // 1. Download image from Supabase Storage
+    if (!session_id || !file_path) {
+      return NextResponse.json({ error: 'missing_params' }, { status: 400 });
+    }
+
+    // Download from Supabase Storage
     const { data: fileData, error: downloadError } = await supabaseServer
-      .storage
-      .from('prescription-images')
-      .download(file_path);
+      .storage.from('prescription-images').download(file_path);
 
     if (downloadError || !fileData) {
       console.error('[process] download error:', downloadError);
-      return NextResponse.json({ error: 'download_failed' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'download_failed', detail: downloadError?.message },
+        { status: 500 }
+      );
     }
-    console.log('[process] file downloaded successfully');
+    console.log('[process] downloaded, size:', fileData.size, 'type:', fileData.type);
 
-    // 2. Convert to base64
+    // Convert to base64
     const arrayBuffer = await fileData.arrayBuffer();
     const base64 = Buffer.from(arrayBuffer).toString('base64');
     const mimeType = fileData.type || 'image/jpeg';
-    console.log('[process] converted to base64, mimeType:', mimeType);
 
-    // 3. Send to Gemini
+    // Send to Gemini
     const rawText = await extractPrescriptionData(base64, mimeType);
-    console.log('[process] Gemini raw response:', rawText);
 
-    // 4. Parse JSON
-    const clean = rawText.replace(/```json|```/g, '').trim();
-    const parsed = JSON.parse(clean);
-    console.log('[process] parsed result:', parsed);
+    // Parse JSON
+    let parsed: Record<string, unknown>;
+    try {
+      const clean = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+      parsed = JSON.parse(clean);
+    } catch (e) {
+      console.error('[process] parse error:', e, 'raw:', rawText);
+      return NextResponse.json({ error: 'parse_failed', raw: rawText }, { status: 500 });
+    }
 
     if (parsed.error) {
       return NextResponse.json({ error: parsed.error }, { status: 422 });
     }
 
-    // 5. Save to Supabase results table
-    await supabaseServer.from('results').insert({
-      session_id,
-      raw_text: rawText,
-      structured_data: parsed
+    // Save to DB (non-blocking)
+    supabaseServer.from('results').insert({
+      session_id, raw_text: rawText, structured_data: parsed
+    }).then(({ error }) => {
+      if (error) console.error('[process] db insert error:', error);
     });
-    console.log('[process] saved to database');
 
+    console.log('[process] success');
     return NextResponse.json(parsed, { status: 200 });
 
-  } catch (err) {
-    console.error('[process] fatal error:', err);
+  } catch (err: unknown) {
+    const error = err as Error;
+    console.error('[process] fatal:', error?.message || err);
     return NextResponse.json(
-      { error: 'processing_failed', message: String(err) },
+      { error: 'processing_failed', message: error?.message || String(err) },
       { status: 500 }
     );
   }
