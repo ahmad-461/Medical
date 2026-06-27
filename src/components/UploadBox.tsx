@@ -9,22 +9,21 @@ import { getCroppedImg } from '@/lib/cropImage';
 import Spinner from './Spinner';
 import { PrescriptionResult } from '@/types/prescription';
 
-const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
-const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/heic', 'application/pdf'];
+type Step = 'idle' | 'compressing' | 'crop' | 'confirm' | 'uploading' | 'analyzing' | 'done';
 
 interface UploadBoxProps {
   onResult: (data: PrescriptionResult) => void;
 }
 
 export default function UploadBox({ onResult }: UploadBoxProps) {
-  const [file, setFile] = useState<File | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [step, setStep] = useState<Step>('idle');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [imageSrc, setImageSrc] = useState<string | null>(null);
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
@@ -33,86 +32,96 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
   }, []);
 
   const resetState = () => {
-    setFile(null);
-    setPreviewUrl(null);
+    setStep('idle');
+    setSelectedFile(null);
+    setImageSrc(null);
     setError(null);
-    setIsAnalyzing(false);
     setCroppedAreaPixels(null);
   };
 
-  const handleFile = async (selectedFile: File) => {
-    resetState();
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
 
-    if (!ALLOWED_TYPES.includes(selectedFile.type)) {
-      setError('Invalid file type. Please upload a JPG, PNG, HEIC, or PDF.');
+    // Reset input value so same file can be selected again
+    e.target.value = '';
+
+    // Validate file type
+    const validTypes = ['image/jpeg', 'image/png', 'image/heic', 'application/pdf'];
+    if (!validTypes.includes(file.type)) {
+      setError('Invalid file type. Please upload JPG, PNG, HEIC, or PDF.');
       return;
     }
 
-    if (selectedFile.size > MAX_FILE_SIZE) {
-      setError('File is too large. Maximum size is 10MB.');
+    // Validate file size (10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setError('File too large. Maximum size is 10MB.');
       return;
     }
 
-    setFile(selectedFile);
+    setError(null);
 
-    if (selectedFile.type === 'application/pdf') {
-      // For PDFs, we just show a placeholder/name since we can't easily preview/crop
-      setPreviewUrl('pdf-placeholder');
-    } else {
-      try {
-        let fileToProcess = selectedFile;
+    if (file.type === 'application/pdf') {
+      // PDF — skip compression and crop, show confirm button directly
+      setSelectedFile(file);
+      setStep('confirm');
+      return;
+    }
 
-        // Compress image
-        const options = {
-          maxSizeMB: 1,
-          maxWidthOrHeight: 1920,
-          useWebWorker: true,
-        };
+    // Image — compress first
+    try {
+      setStep('compressing');
+      const compressed = await imageCompression(file, {
+        maxSizeMB: 1,
+        maxWidthOrHeight: 1920,
+        useWebWorker: true,
+      });
+      const imageUrl = URL.createObjectURL(compressed);
+      setImageSrc(imageUrl);
+      setSelectedFile(compressed);
+      setStep('crop'); // Show crop UI
+    } catch (err) {
+      console.error(err);
+      setError('Failed to process image. Please try again.');
+      setStep('idle');
+    }
+  };
 
-        // browser-image-compression might fail on some HEIC or very large files depending on environment
-        try {
-          fileToProcess = await imageCompression(selectedFile, options);
-        } catch (e) {
-          console.warn('Compression failed, using original file', e);
-        }
+  const handleConfirmCrop = async () => {
+    if (!imageSrc || !croppedAreaPixels) return;
 
-        const reader = new FileReader();
-        reader.onload = () => {
-          setPreviewUrl(reader.result as string);
-        };
-        reader.readAsDataURL(fileToProcess);
-      } catch (err) {
-        setError('Error processing image. Please try again.');
-        console.error(err);
-      }
+    try {
+      setStep('compressing'); // Reuse compressing or could have a 'cropping' state
+      const croppedBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
+      const croppedFile = new File([croppedBlob], selectedFile?.name || 'cropped.jpg', { type: 'image/jpeg' });
+
+      const croppedUrl = URL.createObjectURL(croppedBlob);
+      setImageSrc(croppedUrl);
+      setSelectedFile(croppedFile);
+      setStep('confirm');
+    } catch (err) {
+      console.error(err);
+      setError('Failed to crop image. Please try again.');
+      setStep('crop');
     }
   };
 
   const handleUpload = async () => {
-    if (!file || !previewUrl) return;
+    if (!selectedFile) return;
 
-    setIsUploading(true);
+    setStep('uploading');
     setError(null);
 
     try {
       const sessionId = await getOrCreateSessionId();
-      let blob: Blob;
-
-      if (file.type === 'application/pdf') {
-        blob = file;
-      } else if (croppedAreaPixels && previewUrl) {
-        blob = await getCroppedImg(previewUrl, croppedAreaPixels);
-      } else {
-        blob = file;
-      }
-
+      const file = selectedFile;
       const ext = file.name.split('.').pop();
       const fileName = `${file.name.replace(`.${ext}`, '')}_${Date.now()}_${crypto.randomUUID().slice(0, 8)}.${ext}`;
       const filePath = `prescriptions/${sessionId}/${fileName}`;
 
       const { error: uploadError } = await supabase.storage
         .from('prescription-images')
-        .upload(filePath, blob, {
+        .upload(filePath, file, {
           contentType: file.type,
           cacheControl: '3600',
           upsert: false
@@ -121,8 +130,7 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
       if (uploadError) throw uploadError;
 
       // Start Analysis
-      setIsUploading(false);
-      setIsAnalyzing(true);
+      setStep('analyzing');
 
       const response = await fetch('/api/process', {
         method: 'POST',
@@ -142,24 +150,18 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
         } else {
           setError("Something went wrong while analyzing. Please try again.");
         }
-        setIsAnalyzing(false);
+        setStep('idle');
         return;
       }
 
       console.log('Analysis result:', result);
+      setStep('done');
       onResult(result);
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Failed to upload prescription. Please try again.';
       setError(errorMessage);
       console.error(err);
-    } finally {
-      setIsUploading(false);
-    }
-  };
-
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      handleFile(e.target.files[0]);
+      setStep('idle');
     }
   };
 
@@ -174,7 +176,7 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
         </div>
       )}
 
-      {!previewUrl ? (
+      {step === 'idle' && (
         <div
           className="border-2 border-dashed border-slate-300 rounded-2xl p-12 bg-slate-50 flex flex-col items-center justify-center transition-colors hover:border-[#2563EB] group cursor-pointer"
           onClick={triggerUpload}
@@ -182,7 +184,12 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
           onDrop={(e) => {
             e.preventDefault();
             if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-              handleFile(e.dataTransfer.files[0]);
+              const droppedFile = e.dataTransfer.files[0];
+              // Manually calling handleFileChange by mocking an event is complex,
+              // but we can extract the logic or just use a helper.
+              // For simplicity, let's just use the logic directly here or refactor.
+              const mockEvent = { target: { files: [droppedFile], value: '' } } as unknown as React.ChangeEvent<HTMLInputElement>;
+              handleFileChange(mockEvent);
             }
           }}
         >
@@ -207,78 +214,103 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
             <span>📷</span> Take Photo
           </button>
         </div>
-      ) : (
+      )}
+
+      {step === 'compressing' && (
+        <div className="bg-slate-50 rounded-2xl p-12 flex flex-col items-center justify-center border border-slate-200">
+          <Spinner size="lg" />
+          <p className="mt-4 text-slate-600 font-medium">Preparing image...</p>
+        </div>
+      )}
+
+      {step === 'crop' && imageSrc && (
         <div className="bg-slate-50 rounded-2xl overflow-hidden border border-slate-200">
           <div className="relative h-80 w-full bg-slate-900">
-            {file?.type === 'application/pdf' ? (
-              <div className="flex flex-col items-center justify-center h-full text-white p-8">
-                <span className="text-6xl mb-4">📑</span>
-                <p className="font-medium text-center">{file.name}</p>
-                <p className="text-sm text-slate-400 mt-2">PDF file selected (Cropping not available)</p>
-              </div>
-            ) : (
-              <Cropper
-                image={previewUrl}
-                crop={crop}
-                zoom={zoom}
-                aspect={undefined}
-                onCropChange={setCrop}
-                onZoomChange={setZoom}
-                onCropComplete={onCropComplete}
-              />
-            )}
+            <Cropper
+              image={imageSrc}
+              crop={crop}
+              zoom={zoom}
+              aspect={undefined}
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={onCropComplete}
+            />
           </div>
-
           <div className="p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
             <button
               onClick={resetState}
-              className="text-slate-500 font-medium hover:text-slate-700 disabled:opacity-50"
-              disabled={isUploading}
-              aria-label="Cancel and choose a different file"
+              className="text-slate-500 font-medium hover:text-slate-700"
             >
               Cancel
             </button>
-
             <button
-              onClick={handleUpload}
-              disabled={isUploading || isAnalyzing}
-              aria-label={isUploading ? "Uploading prescription" : isAnalyzing ? "Analyzing prescription" : "Confirm and upload prescription for analysis"}
-              className="w-full sm:w-auto px-8 py-3 bg-[#2563EB] text-white rounded-full font-bold flex items-center justify-center gap-3 hover:bg-blue-700 transition-colors disabled:bg-blue-300"
+              onClick={handleConfirmCrop}
+              className="w-full sm:w-auto px-8 py-3 bg-[#2563EB] text-white rounded-full font-bold hover:bg-blue-700 transition-colors"
             >
-              {isUploading ? (
-                <>
-                  <Spinner size="sm" />
-                  Uploading...
-                </>
-              ) : isAnalyzing ? (
-                <>
-                  <Spinner size="sm" />
-                  Analyzing your prescription...
-                </>
-              ) : (
-                'Confirm & Upload'
-              )}
+              Confirm Crop
             </button>
           </div>
         </div>
       )}
 
+      {step === 'confirm' && (
+        <div className="bg-slate-50 rounded-2xl overflow-hidden border border-slate-200">
+          <div className="p-8 flex flex-col items-center justify-center bg-slate-100 border-b border-slate-200">
+            {selectedFile?.type === 'application/pdf' ? (
+              <div className="flex flex-col items-center">
+                <span className="text-6xl mb-4">📄</span>
+                <p className="font-medium text-slate-700 text-center">{selectedFile.name}</p>
+                <p className="text-sm text-slate-400 mt-1">PDF File</p>
+              </div>
+            ) : (
+              imageSrc && (
+                <div className="relative w-full max-h-64 flex justify-center">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={imageSrc} alt="Prescription Preview" className="max-h-64 rounded shadow-sm object-contain" />
+                </div>
+              )
+            )}
+          </div>
+          <div className="p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <button
+              onClick={resetState}
+              className="text-slate-500 font-medium hover:text-slate-700"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleUpload}
+              className="w-full sm:w-auto px-8 py-3 bg-[#2563EB] text-white rounded-full font-bold flex items-center justify-center gap-3 hover:bg-blue-700 transition-colors"
+            >
+              Confirm & Upload
+            </button>
+          </div>
+        </div>
+      )}
+
+      {(step === 'uploading' || step === 'analyzing') && (
+        <div className="bg-slate-50 rounded-2xl p-12 flex flex-col items-center justify-center border border-slate-200">
+          <Spinner size="lg" />
+          <p className="mt-4 text-slate-600 font-medium">
+            {step === 'uploading' ? 'Uploading...' : 'Analyzing your prescription...'}
+          </p>
+        </div>
+      )}
+
       <input
-        type="file"
         ref={fileInputRef}
-        onChange={onFileChange}
-        accept=".jpg,.jpeg,.png,.heic,.pdf"
+        type="file"
+        accept="image/jpeg,image/png,image/heic,application/pdf"
         className="hidden"
-        aria-label="Upload prescription file"
+        onChange={handleFileChange}
       />
       <input
-        type="file"
         ref={cameraInputRef}
-        onChange={onFileChange}
+        type="file"
         accept="image/*"
         capture="environment"
         className="hidden"
-        aria-label="Take prescription photo"
+        onChange={handleFileChange}
       />
     </div>
   );
