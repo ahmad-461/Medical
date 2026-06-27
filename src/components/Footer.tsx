@@ -45,6 +45,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/drug-interaction-checker" className="text-sm text-gray-400 hover:text-blue-400 transition-colors flex items-center gap-2">
+                  <span>🔍</span> Drug Interaction Checker
+                </Link>
+              </li>
+              <li>
                 <Link href="/faq" className="text-sm text-gray-400 hover:text-blue-400 transition-colors flex items-center gap-2">
                   <span>❓</span> FAQ
                 </Link>
