@@ -1,11 +1,9 @@
 'use client';
 
-import React, { useState, useCallback, useRef } from 'react';
-import Cropper, { Area } from 'react-easy-crop';
+import React, { useState, useRef } from 'react';
 import imageCompression from 'browser-image-compression';
 import { supabase } from '@/lib/supabase';
 import { getOrCreateSessionId } from '@/lib/session';
-import { getCroppedImg } from '@/lib/cropImage';
 import Spinner from './Spinner';
 import { PrescriptionResult } from '@/types/prescription';
 
@@ -19,24 +17,16 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
   const [step, setStep] = useState<Step>('idle');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
-  const [crop, setCrop] = useState({ x: 0, y: 0 });
-  const [zoom, setZoom] = useState(1);
-  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
-
-  const onCropComplete = useCallback((_area: Area, areaPixels: Area) => {
-    setCroppedAreaPixels(areaPixels);
-  }, []);
 
   const resetState = () => {
     setStep('idle');
     setSelectedFile(null);
     setImageSrc(null);
     setError(null);
-    setCroppedAreaPixels(null);
   };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -61,48 +51,29 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
 
     setError(null);
 
-    if (file.type === 'application/pdf') {
-      // PDF — skip compression and crop, show confirm button directly
-      setSelectedFile(file);
-      setStep('confirm');
-      return;
-    }
-
-    // Image — compress first
     try {
       setStep('compressing');
-      const compressed = await imageCompression(file, {
-        maxSizeMB: 1,
-        maxWidthOrHeight: 1920,
-        useWebWorker: true,
-      });
-      const imageUrl = URL.createObjectURL(compressed);
-      setImageSrc(imageUrl);
-      setSelectedFile(compressed);
-      setStep('crop'); // Show crop UI
+
+      let finalFile = file;
+      if (file.type !== 'application/pdf') {
+        finalFile = await imageCompression(file, {
+          maxSizeMB: 1,
+          maxWidthOrHeight: 1920,
+          useWebWorker: true,
+        });
+        const imageUrl = URL.createObjectURL(finalFile);
+        setImageSrc(imageUrl);
+      } else {
+        // For PDF, we just set the file and it will show the PDF icon in confirm state
+        setSelectedFile(file);
+      }
+
+      setSelectedFile(finalFile);
+      setStep('confirm'); // Skip crop UI, go directly to confirm
     } catch (err) {
       console.error(err);
       setError('Failed to process image. Please try again.');
       setStep('idle');
-    }
-  };
-
-  const handleConfirmCrop = async () => {
-    if (!imageSrc || !croppedAreaPixels) return;
-
-    try {
-      setStep('compressing'); // Reuse compressing or could have a 'cropping' state
-      const croppedBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
-      const croppedFile = new File([croppedBlob], selectedFile?.name || 'cropped.jpg', { type: 'image/jpeg' });
-
-      const croppedUrl = URL.createObjectURL(croppedBlob);
-      setImageSrc(croppedUrl);
-      setSelectedFile(croppedFile);
-      setStep('confirm');
-    } catch (err) {
-      console.error(err);
-      setError('Failed to crop image. Please try again.');
-      setStep('crop');
     }
   };
 
@@ -176,42 +147,47 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
       )}
 
       {step === 'idle' && (
-        <div
-          className="border-2 border-dashed border-slate-300 dark:border-gray-600 rounded-2xl p-12 bg-white dark:bg-gray-800 flex flex-col items-center justify-center transition-colors hover:border-[#2563EB] group cursor-pointer"
-          onClick={triggerUpload}
-          onDragOver={(e) => e.preventDefault()}
-          onDrop={(e) => {
-            e.preventDefault();
-            if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-              const droppedFile = e.dataTransfer.files[0];
-              // Manually calling handleFileChange by mocking an event is complex,
-              // but we can extract the logic or just use a helper.
-              // For simplicity, let's just use the logic directly here or refactor.
-              const mockEvent = { target: { files: [droppedFile], value: '' } } as unknown as React.ChangeEvent<HTMLInputElement>;
-              handleFileChange(mockEvent);
-            }
-          }}
-        >
-          <div className="w-16 h-16 bg-white dark:bg-gray-700 rounded-full shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-            <span className="text-3xl">📄</span>
-          </div>
-          <p className="text-gray-600 dark:text-gray-400 font-medium text-center">
-            Drop your prescription here or click to upload
-          </p>
-          <p className="text-slate-400 dark:text-gray-500 text-xs mt-2">
-            Supports JPG, PNG, HEIC, PDF (Max 10MB)
-          </p>
-
-          <button
-            className="mt-6 md:hidden px-6 py-3 bg-[#2563EB] text-white rounded-full font-semibold flex items-center gap-2"
-            aria-label="Take a photo of your prescription using your camera"
-            onClick={(e) => {
-              e.stopPropagation();
-              triggerCamera();
+        <div className="space-y-4">
+          <div
+            className="border-2 border-dashed border-slate-300 dark:border-gray-600 rounded-2xl p-10 bg-white dark:bg-gray-800 flex flex-col items-center justify-center transition-colors hover:border-[#2563EB] group cursor-pointer"
+            onClick={triggerUpload}
+            onDragOver={(e) => e.preventDefault()}
+            onDrop={(e) => {
+              e.preventDefault();
+              if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+                const droppedFile = e.dataTransfer.files[0];
+                const mockEvent = { target: { files: [droppedFile], value: '' } } as unknown as React.ChangeEvent<HTMLInputElement>;
+                handleFileChange(mockEvent);
+              }
             }}
           >
-            <span>📷</span> Take Photo
-          </button>
+            <div className="w-16 h-16 bg-white dark:bg-gray-700 rounded-full shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+              <span className="text-3xl">📄</span>
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 font-medium text-center">
+              Click to choose a file or PDF
+            </p>
+            <p className="text-slate-400 dark:text-gray-500 text-xs mt-2">
+              Supports JPG, PNG, HEIC, PDF (Max 10MB)
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row gap-3">
+            <button
+              className="flex-1 px-6 py-4 bg-[#2563EB] text-white rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-blue-700 transition-colors shadow-md"
+              aria-label="Take a photo of your prescription using your camera"
+              onClick={triggerCamera}
+            >
+              <span className="text-xl">📷</span> Take Photo
+            </button>
+            <button
+              className="flex-1 px-6 py-4 bg-white dark:bg-gray-800 border-2 border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-200 rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors shadow-sm"
+              aria-label="Upload a file or PDF"
+              onClick={triggerUpload}
+            >
+              <span className="text-xl">📁</span> Upload File
+            </button>
+          </div>
         </div>
       )}
 
@@ -222,35 +198,6 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
         </div>
       )}
 
-      {step === 'crop' && imageSrc && (
-        <div className="bg-slate-50 dark:bg-gray-800 rounded-2xl overflow-hidden border border-slate-200 dark:border-gray-700">
-          <div className="relative h-80 w-full bg-slate-900">
-            <Cropper
-              image={imageSrc}
-              crop={crop}
-              zoom={zoom}
-              aspect={undefined}
-              onCropChange={setCrop}
-              onZoomChange={setZoom}
-              onCropComplete={onCropComplete}
-            />
-          </div>
-          <div className="p-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <button
-              onClick={resetState}
-              className="text-slate-500 font-medium hover:text-slate-700"
-            >
-              Cancel
-            </button>
-            <button
-              onClick={handleConfirmCrop}
-              className="w-full sm:w-auto px-8 py-3 bg-[#2563EB] text-white rounded-full font-bold hover:bg-blue-700 transition-colors"
-            >
-              Confirm Crop
-            </button>
-          </div>
-        </div>
-      )}
 
       {step === 'confirm' && (
         <div className="bg-slate-50 dark:bg-gray-800 rounded-2xl overflow-hidden border border-slate-200 dark:border-gray-700">
@@ -306,7 +253,7 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
       <input
         ref={cameraInputRef}
         type="file"
-        accept="image/*"
+        accept="image/jpeg,image/png,image/heic"
         capture="environment"
         className="hidden"
         onChange={handleFileChange}

@@ -8,7 +8,7 @@ export async function extractPrescriptionData(
   if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
 
   const prompt = `You are a medical prescription reader. Analyze this prescription image and extract all medicine information. Return ONLY valid JSON with no markdown, no backticks, no code fences, no explanation.
 
