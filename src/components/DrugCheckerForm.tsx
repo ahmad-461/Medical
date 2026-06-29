@@ -48,10 +48,10 @@ export default function DrugCheckerForm() {
         const messages: Record<string, string> = {
           minimum_two_medicines: 'Please enter at least 2 medicine names.',
           maximum_five_medicines: 'Maximum 5 medicines allowed at once.',
-          parse_failed: 'AI returned unexpected response. Please try again.',
-          check_failed: 'Check failed. Please try again.',
+          parse_failed: 'AI returned an unexpected response. Please check the medicine names and try again.',
+          check_failed: 'Check failed. This might be due to an invalid medicine name or a temporary service issue. Please try again.',
         };
-        setError(messages[data.error] || 'Something went wrong. Please try again.');
+        setError(messages[data.error] || `Error: ${data.message || 'Something went wrong. Please try again.'}`);
         return;
       }
       setResult(data);
