@@ -58,7 +58,6 @@ Return only JSON, nothing else.`;
 
     const result = await model.generateContent(prompt);
     const rawText = result.response.text();
-    console.log('[interactions] Gemini response:', rawText);
 
     let parsed: unknown;
     try {

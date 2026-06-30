@@ -1,12 +1,26 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
+import { Metadata } from 'next';
 import { abbreviations } from '@/data/abbreviations';
+import JsonLd from '@/components/JsonLd';
 
 export const dynamic = "force-static";
 
 interface Props {
   params: {
     slug: string;
+  };
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const abbr = abbreviations.find(a => a.slug === params.slug);
+  if (!abbr) return { title: 'Not Found' };
+  return {
+    title: `${abbr.code} Meaning — What Does ${abbr.code} Mean on a Prescription?`,
+    description: `${abbr.code} on a prescription means ${abbr.plain_english.slice(0, 120)}. Learn what ${abbr.code} stands for and how it affects how you take your medicine.`,
+    alternates: {
+      canonical: `/prescription-abbreviations/${params.slug}`,
+    },
   };
 }
 
@@ -25,8 +39,17 @@ export default function AbbreviationDetailPage({ params }: Props) {
 
   const relatedAbbrs = abbreviations.filter(a => abbr.related.includes(a.slug));
 
+  const jsonLdData = {
+    "@context": "https://schema.org",
+    "@type": "DefinedTerm",
+    "name": abbr.code,
+    "description": abbr.plain_english,
+    "inDefinedTermSet": "https://medical-120-nu.vercel.app/prescription-abbreviations"
+  };
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-12 prose prose-slate dark:prose-invert">
+      <JsonLd data={jsonLdData} />
       <nav className="mb-8 not-prose">
         <Link href="/prescription-abbreviations" className="text-sm text-[#2563EB] dark:text-blue-400 hover:underline flex items-center gap-1">
           ← Back to Abbreviations

@@ -8,12 +8,6 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: Request) {
   try {
     const { session_id, file_path } = await req.json();
-    console.log('[process] start:', { session_id, file_path });
-    console.log('[process] env:', {
-      hasGemini: !!process.env.GEMINI_API_KEY,
-      hasSupabase: !!process.env.NEXT_PUBLIC_SUPABASE_URL,
-      hasService: !!process.env.SUPABASE_SERVICE_ROLE_KEY,
-    });
 
     if (!session_id || !file_path) {
       return NextResponse.json({ error: 'missing_params' }, { status: 400 });
@@ -30,7 +24,6 @@ export async function POST(req: Request) {
         { status: 500 }
       );
     }
-    console.log('[process] downloaded, size:', fileData.size, 'type:', fileData.type);
 
     // Convert to base64
     const arrayBuffer = await fileData.arrayBuffer();
@@ -61,7 +54,6 @@ export async function POST(req: Request) {
       if (error) console.error('[process] db insert error:', error);
     });
 
-    console.log('[process] success');
     return NextResponse.json(parsed, { status: 200 });
 
   } catch (err: unknown) {

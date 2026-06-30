@@ -4,6 +4,9 @@ export const dynamic = "force-static";
 
 export const metadata: Metadata = {
   title: "Medical Disclaimer — RxReader",
+  alternates: {
+    canonical: "/disclaimer",
+  },
 };
 
 export default function DisclaimerPage() {

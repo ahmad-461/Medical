@@ -1,13 +1,28 @@
 import { Metadata } from "next";
+import JsonLd from "@/components/JsonLd";
+
+export const dynamic = 'force-static';
 
 export const metadata: Metadata = {
   title: "About RxReader — Free AI Prescription Reader",
   description: "RxReader is a free AI-powered tool that helps patients understand their doctor's prescriptions. Learn about our mission, technology, and commitment to privacy.",
+  alternates: {
+    canonical: "/about",
+  },
 };
 
 export default function AboutPage() {
+  const jsonLdData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "About RxReader",
+    "description": "Learn about RxReader's mission to help patients understand their doctor's prescriptions using AI.",
+    "url": "https://rxreader.vercel.app/about"
+  };
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-12">
+      <JsonLd data={jsonLdData} />
       <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white mb-8">About RxReader — Free AI Prescription Reader</h1>
 
       <div className="space-y-12 leading-relaxed text-gray-700 dark:text-gray-300">

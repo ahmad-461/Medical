@@ -8,8 +8,12 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "RxReader - AI Prescription Reader",
-  description: "Read Any Doctor's Prescription Instantly",
+  title: 'RxReader — Free AI Prescription Reader',
+  description: "Upload any doctor's prescription and get a plain-English explanation of every medicine, dosage, and instruction. Free, instant, and private.",
+  metadataBase: new URL('https://rxreader.vercel.app'),
+  alternates: {
+    canonical: '/',
+  },
 };
 
 export default function RootLayout({
