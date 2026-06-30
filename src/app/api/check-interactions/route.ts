@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
 
     const medicineList = medicines.join(', ');
 
@@ -56,7 +56,26 @@ If all medicines are safe together set overall_safety to "safe" and interactions
 Always set consult_doctor to true.
 Return only JSON, nothing else.`;
 
-    const result = await model.generateContent(prompt);
+    let result;
+    try {
+      result = await model.generateContent(prompt);
+    } catch (apiError: any) {
+      console.error('[interactions] Gemini API error:', apiError.message);
+      if (apiError.message?.includes('404') || apiError.message?.includes('not found')) {
+        try {
+          const diagResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+          const diagData = await diagResp.json();
+          console.error('[interactions] [Diagnostic] Available models:', JSON.stringify(diagData.models?.map((m: any) => m.name)));
+        } catch (diagErr) {
+          console.error('[interactions] [Diagnostic] Failed diagnostic list:', diagErr);
+        }
+      }
+      return NextResponse.json(
+        { error: 'api_error', message: apiError.message },
+        { status: 500 }
+      );
+    }
+
     const rawText = result.response.text();
 
     let parsed: unknown;
