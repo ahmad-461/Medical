@@ -50,6 +50,16 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link href="/lab-report-explainer" className="text-sm text-gray-400 hover:text-blue-400 transition-colors flex items-center gap-2">
+                  <span>🧪</span> Lab Report Explainer
+                </Link>
+              </li>
+              <li>
+                <Link href="/child-dose-calculator" className="text-sm text-gray-400 hover:text-blue-400 transition-colors flex items-center gap-2">
+                  <span>👶</span> Child Dose Calculator
+                </Link>
+              </li>
+              <li>
                 <Link href="/faq" className="text-sm text-gray-400 hover:text-blue-400 transition-colors flex items-center gap-2">
                   <span>❓</span> FAQ
                 </Link>

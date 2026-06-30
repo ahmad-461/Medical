@@ -52,7 +52,7 @@ export default function HowToReadPage() {
 
         <h2>5. Decoding Frequency Abbreviations</h2>
         <p>
-          Doctors often use Latin abbreviations to indicate how often to take medicine. For example, &quot;OD&quot; means once daily. You can find a full list of these in our <Link href="/prescription-abbreviations">Prescription Abbreviations Guide</Link>.
+          Doctors often use Latin abbreviations to indicate how often to take medicine. For example, &quot;OD&quot; means once daily. Learn more in our complete <Link href="/prescription-abbreviations" className="text-blue-600 dark:text-blue-400 hover:underline">prescription abbreviations guide</Link>.
         </p>
 
         <h2>6. Special Instructions (AC, PC, HS)</h2>

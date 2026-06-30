@@ -31,7 +31,7 @@ export default function AbbreviationsPage() {
       <div className="max-w-3xl mx-auto mb-12 text-center">
         <h1 className="text-3xl font-bold mb-4 dark:text-white">Prescription Abbreviations Explained</h1>
         <p className="text-slate-600 dark:text-gray-400">
-          A complete guide to common medical abbreviations used by doctors on prescriptions.
+          A complete guide to common medical abbreviations used by doctors on prescriptions. For a full step-by-step tutorial, see our <Link href="/how-to-read-a-prescription" className="text-blue-600 dark:text-blue-400 hover:underline">how to read a prescription guide</Link>.
         </p>
       </div>
 
@@ -110,7 +110,7 @@ export default function AbbreviationsPage() {
             The best approach to understanding your prescription is to use multiple resources together. First, use RxReader to upload a photo of your prescription and get an instant plain-English breakdown of every medicine and abbreviation. Second, use the abbreviation guide on this page to look up any specific codes you want to understand better. Third, always confirm your understanding with your pharmacist before starting any new medicine — pharmacists are specially trained to counsel patients on correct medicine use and are available at every pharmacy without an appointment.
           </p>
           <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
-            Prescription literacy is a critical but frequently overlooked health skill. Patients who fully understand their own prescriptions are significantly less likely to experience medication errors, dangerous drug interactions, or missed doses that reduce treatment effectiveness. By learning the common prescription abbreviations on this page, you are taking a meaningful step toward better personal health management. Bookmark this abbreviations guide and share it with elderly family members or caregivers who regularly deal with prescription medicines and may find these codes confusing.
+            Prescription literacy is a critical but frequently overlooked health skill. Patients who fully understand their own prescriptions are significantly less likely to experience medication errors, dangerous drug interactions, or missed doses that reduce treatment effectiveness. By learning the common prescription abbreviations on this page, you are taking a meaningful step toward better personal health management. Read more about patient safety and education on our <Link href="/rxnotes" className="text-blue-600 dark:text-blue-400 hover:underline">RxNotes blog</Link>.
           </p>
         </div>
       </section>

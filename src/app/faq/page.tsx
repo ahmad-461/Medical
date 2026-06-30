@@ -77,7 +77,7 @@ export default function FAQPage() {
             Everything You Need to Know About RxReader
           </h2>
           <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
-            RxReader is one of the first free AI-powered prescription reading tools designed specifically for patients rather than medical professionals. Since launching it has helped thousands of patients in over 10 countries understand their prescriptions, decode medical abbreviations, and take their medicines correctly and safely. Here we answer the most common questions patients ask about using RxReader and AI prescription reading tools in general.
+            RxReader is one of the first free AI-powered prescription reading tools designed specifically for patients rather than medical professionals. Since launching it has helped thousands of patients in over 10 countries understand their prescriptions, decode medical abbreviations, and take their medicines correctly and safely. Here we answer the most common questions patients ask about using the <Link href="/" className="text-blue-600 dark:text-blue-400 hover:underline">RxReader tool</Link> and AI prescription reading tools in general.
           </p>
 
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 mt-10">
@@ -120,7 +120,7 @@ export default function FAQPage() {
             RxReader is designed to empower patients with information and understanding, not to replace the essential relationship between patients and their healthcare providers. Think of RxReader as a knowledgeable friend who helps you understand the medical document in your hands and prepares you to ask better questions — but your doctor and pharmacist remain the authoritative sources for all clinical medical decisions. Use RxReader to arrive at your pharmacy better informed, not to make independent medical decisions that bypass professional medical advice.
           </p>
           <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
-            RxReader continues to expand its tools to serve patients better. In addition to prescription reading, our growing suite includes a free drug interaction checker that helps verify the safety of taking multiple medicines together. We are committed to keeping every tool on RxReader completely free, ad-supported only, with no subscriptions or hidden charges of any kind for patients who need quick, reliable medical information they can trust.
+            RxReader continues to expand its tools to serve patients better. In addition to prescription reading, our growing suite includes a free <Link href="/drug-interaction-checker" className="text-blue-600 dark:text-blue-400 hover:underline">drug interaction checker</Link> that helps verify the safety of taking multiple medicines together. We are committed to keeping every tool on RxReader completely free, ad-supported only, with no subscriptions or hidden charges of any kind for patients who need quick, reliable medical information they can trust.
           </p>
         </div>
       </section>
