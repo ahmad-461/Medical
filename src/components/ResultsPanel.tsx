@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { PrescriptionResult, Medicine } from '@/types/prescription';
 import { generatePDF } from '@/lib/generatePDF';
 import Spinner from '@/components/Spinner';
+import AskPrescriptionChat from '@/components/AskPrescriptionChat';
 
 interface ResultsPanelProps {
   data: PrescriptionResult;
@@ -263,6 +264,11 @@ export default function ResultsPanel({ data, onReset }: ResultsPanelProps) {
               </ul>
             </div>
           )}
+      </div>
+
+      {/* Scoped Chatbot */}
+      <div className="no-print">
+        <AskPrescriptionChat prescriptionContext={{ ...data, medicines }} />
       </div>
 
       {/* Action Buttons */}

@@ -6,10 +6,8 @@
   - Local:        http://localhost:3000
 
  ✓ Starting...
- ✓ Ready in 1694ms
+ ✓ Ready in 1715ms
  ○ Compiling / ...
- ✓ Compiled / in 11s (1164 modules)
- GET / 200 in 12046ms
- ✓ Compiled in 1081ms (537 modules)
- GET / 200 in 64ms
- GET / 200 in 48ms
+ ✓ Compiled / in 11.6s (1166 modules)
+ GET / 200 in 12789ms
+ ✓ Compiled in 1248ms (538 modules)
