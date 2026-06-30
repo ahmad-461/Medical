@@ -59,19 +59,21 @@ Return only JSON, nothing else.`;
     let result;
     try {
       result = await model.generateContent(prompt);
-    } catch (apiError: any) {
-      console.error('[interactions] Gemini API error:', apiError.message);
-      if (apiError.message?.includes('404') || apiError.message?.includes('not found')) {
+    } catch (apiError: unknown) {
+      const apiErrorMessage = apiError instanceof Error ? apiError.message : String(apiError);
+      console.error('[interactions] Gemini API error:', apiErrorMessage);
+
+      if (apiErrorMessage.includes('404') || apiErrorMessage.includes('not found')) {
         try {
           const diagResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
-          const diagData = await diagResp.json();
-          console.error('[interactions] [Diagnostic] Available models:', JSON.stringify(diagData.models?.map((m: any) => m.name)));
+          const diagData = await diagResp.json() as { models?: Array<{ name: string }> };
+          console.error('[interactions] [Diagnostic] Available models:', JSON.stringify(diagData.models?.map(m => m.name)));
         } catch (diagErr) {
           console.error('[interactions] [Diagnostic] Failed diagnostic list:', diagErr);
         }
       }
       return NextResponse.json(
-        { error: 'api_error', message: apiError.message },
+        { error: 'api_error', message: apiErrorMessage },
         { status: 500 }
       );
     }

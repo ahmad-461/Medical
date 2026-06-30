@@ -41,15 +41,16 @@ If unreadable return: {"error":"unreadable"}`;
 
     const text = result.response.text();
     return text;
-  } catch (error: any) {
-    console.error('[Gemini Error]:', error.message);
-    if (error.message?.includes('404') || error.message?.includes('not found')) {
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('[Gemini Error]:', errorMessage);
+
+    if (errorMessage.includes('404') || errorMessage.includes('not found')) {
       console.error('[Diagnostic] Attempting to list available models...');
       try {
-        // We use a fetch here to avoid dependency on listModels if not available in this SDK version
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
-        const data = await response.json();
-        console.error('[Diagnostic] Available models:', JSON.stringify(data.models?.map((m: any) => m.name)));
+        const data = await response.json() as { models?: Array<{ name: string }> };
+        console.error('[Diagnostic] Available models:', JSON.stringify(data.models?.map(m => m.name)));
       } catch (listError) {
         console.error('[Diagnostic] Failed to list models:', listError);
       }
