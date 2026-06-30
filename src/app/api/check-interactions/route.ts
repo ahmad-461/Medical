@@ -26,7 +26,7 @@ export async function POST(req: Request) {
     if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash-latest' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
 
     const medicineList = medicines.join(', ');
 
@@ -56,40 +56,43 @@ If all medicines are safe together set overall_safety to "safe" and interactions
 Always set consult_doctor to true.
 Return only JSON, nothing else.`;
 
-    let result;
     try {
-      result = await model.generateContent(prompt);
+      const result = await model.generateContent(prompt);
+      const rawText = result.response.text();
+
+      let parsed: unknown;
+      try {
+        const clean = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+        parsed = JSON.parse(clean);
+      } catch (e) {
+        console.error('[interactions] parse error:', e);
+        return NextResponse.json({ error: 'parse_failed' }, { status: 500 });
+      }
+
+      return NextResponse.json(parsed, { status: 200 });
     } catch (apiError: unknown) {
       const apiErrorMessage = apiError instanceof Error ? apiError.message : String(apiError);
       console.error('[interactions] Gemini API error:', apiErrorMessage);
 
+      let finalMessage = apiErrorMessage;
       if (apiErrorMessage.includes('404') || apiErrorMessage.includes('not found')) {
         try {
           const diagResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
           const diagData = await diagResp.json() as { models?: Array<{ name: string }> };
-          console.error('[interactions] [Diagnostic] Available models:', JSON.stringify(diagData.models?.map(m => m.name)));
+          const availableModels = diagData.models?.map(m => m.name);
+          if (availableModels) {
+            finalMessage = `${apiErrorMessage} | Available models for your key: ${availableModels.join(', ')}`;
+          }
+          console.error('[interactions] [Diagnostic] Available models:', JSON.stringify(availableModels));
         } catch (diagErr) {
           console.error('[interactions] [Diagnostic] Failed diagnostic list:', diagErr);
         }
       }
       return NextResponse.json(
-        { error: 'api_error', message: apiErrorMessage },
+        { error: 'api_error', message: finalMessage },
         { status: 500 }
       );
     }
-
-    const rawText = result.response.text();
-
-    let parsed: unknown;
-    try {
-      const clean = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-      parsed = JSON.parse(clean);
-    } catch (e) {
-      console.error('[interactions] parse error:', e);
-      return NextResponse.json({ error: 'parse_failed' }, { status: 500 });
-    }
-
-    return NextResponse.json(parsed, { status: 200 });
 
   } catch (err: unknown) {
     const errorMessage = err instanceof Error ? err.message : String(err);
