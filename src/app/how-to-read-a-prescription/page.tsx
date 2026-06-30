@@ -7,6 +7,9 @@ export const dynamic = "force-static";
 export const metadata: Metadata = {
   title: "How to Read a Doctor's Prescription — Step by Step Guide",
   description: "Learn how to read a doctor's prescription with our simple step-by-step guide.",
+  alternates: {
+    canonical: "/how-to-read-a-prescription",
+  },
 };
 
 export default function HowToReadPage() {

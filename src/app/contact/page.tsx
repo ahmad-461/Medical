@@ -1,15 +1,28 @@
 import { Metadata } from 'next';
 import { Mail } from 'lucide-react';
+import JsonLd from '@/components/JsonLd';
 
 export const dynamic = "force-static";
 
 export const metadata: Metadata = {
   title: "Contact Us — RxReader",
+  alternates: {
+    canonical: "/contact",
+  },
 };
 
 export default function ContactPage() {
+  const jsonLdData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Contact Us",
+    "description": "Get in touch with RxReader for questions or feedback.",
+    "url": "https://rxreader.vercel.app/contact"
+  };
+
   return (
     <div className="max-w-3xl mx-auto px-4 py-12 prose prose-slate dark:prose-invert">
+      <JsonLd data={jsonLdData} />
       <h1 className="text-3xl font-bold mb-8 dark:text-white">Contact Us</h1>
 
       <p className="dark:text-gray-300">

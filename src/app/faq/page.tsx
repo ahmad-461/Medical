@@ -8,6 +8,9 @@ export const dynamic = "force-static";
 export const metadata: Metadata = {
   title: "Frequently Asked Questions — RxReader",
   description: "Find answers to commonly asked questions about RxReader, our AI-powered prescription reader.",
+  alternates: {
+    canonical: "/faq",
+  },
 };
 
 const faqs = [
@@ -115,6 +118,9 @@ export default function FAQPage() {
           </p>
           <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
             RxReader is designed to empower patients with information and understanding, not to replace the essential relationship between patients and their healthcare providers. Think of RxReader as a knowledgeable friend who helps you understand the medical document in your hands and prepares you to ask better questions — but your doctor and pharmacist remain the authoritative sources for all clinical medical decisions. Use RxReader to arrive at your pharmacy better informed, not to make independent medical decisions that bypass professional medical advice.
+          </p>
+          <p className="text-gray-700 dark:text-gray-300 mb-4 leading-relaxed">
+            RxReader continues to expand its tools to serve patients better. In addition to prescription reading, our growing suite includes a free drug interaction checker that helps verify the safety of taking multiple medicines together. We are committed to keeping every tool on RxReader completely free, ad-supported only, with no subscriptions or hidden charges of any kind for patients who need quick, reliable medical information they can trust.
           </p>
         </div>
       </section>

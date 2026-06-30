@@ -1,17 +1,33 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
 import { abbreviations } from '@/data/abbreviations';
+import JsonLd from '@/components/JsonLd';
 
 export const dynamic = "force-static";
 
 export const metadata: Metadata = {
   title: "Prescription Abbreviations Explained — Complete Guide",
   description: "Complete guide to prescription abbreviations like OD, BD, TDS, SOS, PRN and more.",
+  alternates: {
+    canonical: "/prescription-abbreviations",
+  },
 };
 
 export default function AbbreviationsPage() {
+  const jsonLdData = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": abbreviations.map((abbr, index) => ({
+      "@type": "ListItem",
+      "position": index + 1,
+      "url": `https://rxreader.vercel.app/prescription-abbreviations/${abbr.slug}`,
+      "name": abbr.code
+    }))
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 py-12">
+      <JsonLd data={jsonLdData} />
       <div className="max-w-3xl mx-auto mb-12 text-center">
         <h1 className="text-3xl font-bold mb-4 dark:text-white">Prescription Abbreviations Explained</h1>
         <p className="text-slate-600 dark:text-gray-400">

@@ -2,8 +2,10 @@
 
 import React, { useState, useRef } from 'react';
 import imageCompression from 'browser-image-compression';
+import Cropper, { Area } from 'react-easy-crop';
 import { supabase } from '@/lib/supabase';
 import { getOrCreateSessionId } from '@/lib/session';
+import { getCroppedImg } from '@/lib/cropImage';
 import Spinner from './Spinner';
 import { PrescriptionResult } from '@/types/prescription';
 
@@ -17,6 +19,9 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
   const [step, setStep] = useState<Step>('idle');
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [imageSrc, setImageSrc] = useState<string | null>(null);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -26,6 +31,9 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
     setStep('idle');
     setSelectedFile(null);
     setImageSrc(null);
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
+    setCroppedAreaPixels(null);
     setError(null);
   };
 
@@ -69,10 +77,37 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
       }
 
       setSelectedFile(finalFile);
-      setStep('confirm'); // Skip crop UI, go directly to confirm
+      if (file.type !== 'application/pdf') {
+        setStep('crop');
+      } else {
+        setStep('confirm');
+      }
     } catch (err) {
       console.error(err);
       setError('Failed to process image. Please try again.');
+      setStep('idle');
+    }
+  };
+
+  const onCropComplete = (_croppedArea: Area, croppedAreaPixels: Area) => {
+    setCroppedAreaPixels(croppedAreaPixels);
+  };
+
+  const handleConfirmCrop = async () => {
+    if (!imageSrc || !croppedAreaPixels) return;
+
+    try {
+      setStep('compressing');
+      const croppedImageBlob = await getCroppedImg(imageSrc, croppedAreaPixels);
+      const croppedFile = new File([croppedImageBlob], selectedFile?.name || 'cropped-image.jpg', {
+        type: 'image/jpeg',
+      });
+      setSelectedFile(croppedFile);
+      setImageSrc(URL.createObjectURL(croppedImageBlob));
+      setStep('confirm');
+    } catch (err) {
+      console.error('Error cropping image:', err);
+      setError('Failed to crop image. Please try again.');
       setStep('idle');
     }
   };
@@ -110,7 +145,6 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
       });
 
       const data = await res.json();
-      console.log('[upload] response:', data);
 
       if (!res.ok || data.error) {
         const messages: Record<string, string> = {
@@ -198,6 +232,50 @@ export default function UploadBox({ onResult }: UploadBoxProps) {
         </div>
       )}
 
+      {step === 'crop' && imageSrc && (
+        <div className="bg-slate-50 dark:bg-gray-800 rounded-2xl overflow-hidden border border-slate-200 dark:border-gray-700">
+          <div className="relative h-80 w-full bg-gray-900">
+            <Cropper
+              image={imageSrc}
+              crop={crop}
+              zoom={zoom}
+              aspect={4 / 3}
+              onCropChange={setCrop}
+              onZoomChange={setZoom}
+              onCropComplete={onCropComplete}
+            />
+          </div>
+          <div className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Zoom</label>
+              <input
+                type="range"
+                value={zoom}
+                min={1}
+                max={3}
+                step={0.1}
+                aria-labelledby="Zoom"
+                onChange={(e) => setZoom(Number(e.target.value))}
+                className="w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-lg appearance-none cursor-pointer"
+              />
+            </div>
+            <div className="flex justify-between items-center">
+              <button
+                onClick={resetState}
+                className="text-gray-500 font-medium hover:text-gray-700 dark:hover:text-gray-300"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleConfirmCrop}
+                className="px-6 py-2 bg-[#2563EB] text-white rounded-lg font-bold hover:bg-blue-700 transition-colors"
+              >
+                Confirm Crop
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {step === 'confirm' && (
         <div className="bg-slate-50 dark:bg-gray-800 rounded-2xl overflow-hidden border border-slate-200 dark:border-gray-700">

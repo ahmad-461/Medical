@@ -39,6 +39,5 @@ If unreadable return: {"error":"unreadable"}`;
   ]);
 
   const text = result.response.text();
-  console.log('[gemini] raw response:', text);
   return text;
 }

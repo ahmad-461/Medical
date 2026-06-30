@@ -187,10 +187,10 @@ export default function Home() {
             ].map((t, i) => (
               <div key={i} className="bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-6 shadow-sm">
                 <div className="flex text-yellow-400 mb-4">⭐⭐⭐⭐⭐</div>
-                <p className="text-gray-700 italic mb-6">“{t.quote}”</p>
+                <p className="text-gray-700 dark:text-gray-300 italic mb-6">“{t.quote}”</p>
                 <div>
-                  <div className="font-semibold text-gray-900">{t.name}</div>
-                  <div className="text-sm text-gray-500">{t.location}</div>
+                  <div className="font-semibold text-gray-900 dark:text-white">{t.name}</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">{t.location}</div>
                 </div>
               </div>
             ))}
