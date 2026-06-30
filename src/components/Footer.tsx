@@ -54,6 +54,7 @@ export default function Footer() {
                   <span>❓</span> FAQ
                 </Link>
               </li>
+              <li><Link href="/rxnotes" className="text-sm text-gray-400 hover:text-blue-400 transition-colors flex items-center gap-2"><span>📝</span> RxNotes Blog</Link></li>
             </ul>
           </div>
 

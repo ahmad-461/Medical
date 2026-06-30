@@ -25,6 +25,7 @@ export default function Header() {
             <Link href="/prescription-abbreviations" className="text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-colors">Abbreviations</Link>
             <Link href="/how-to-read-a-prescription" className="text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-colors">How to Read</Link>
             <Link href="/faq" className="text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-colors">FAQ</Link>
+            <Link href="/rxnotes" className="text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-colors">Blog</Link>
             <div className="relative group">
               <button className="text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-colors flex items-center gap-1">
                 More Tools <span className="text-xs">▾</span>
@@ -88,6 +89,7 @@ export default function Header() {
             <Link href="/prescription-abbreviations" onClick={() => setOpen(false)} className="px-3 py-2.5 text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 rounded-lg transition-colors">📖 Abbreviations</Link>
             <Link href="/how-to-read-a-prescription" onClick={() => setOpen(false)} className="px-3 py-2.5 text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 rounded-lg transition-colors">📋 How to Read</Link>
             <Link href="/faq" onClick={() => setOpen(false)} className="px-3 py-2.5 text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 rounded-lg transition-colors">❓ FAQ</Link>
+            <Link href="/rxnotes" onClick={() => setOpen(false)} className="px-3 py-2.5 text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 rounded-lg transition-colors">📝 Blog</Link>
             <div className="px-3 py-2">
               <p className="text-xs font-semibold text-blue-300 uppercase tracking-wider mb-2">More Tools</p>
               <Link href="/drug-interaction-checker" onClick={() => setOpen(false)} className="flex items-center gap-2 py-2 text-sm text-blue-100 hover:text-white">
