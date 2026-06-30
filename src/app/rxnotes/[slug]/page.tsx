@@ -165,37 +165,39 @@ export default function BlogPostPage({ params }: Props) {
   );
 }
 
-// Helper to render RxReader as a link if present
+// Helper to render markdown links [text](url)
 function renderParagraphWithLinks(text: string) {
-  // We're looking for RxReader's AI prescription reader or try RxReader for free
-  const phrases = [
-    { text: "RxReader's AI prescription reader", href: "/" },
-    { text: "try RxReader for free", href: "/" }
-  ];
+  const parts = [];
+  const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
+  let lastIndex = 0;
+  let match;
 
-  let result: (string | React.ReactNode)[] = [text];
+  while ((match = regex.exec(text)) !== null) {
+    // Add text before the link
+    if (match.index > lastIndex) {
+      parts.push(text.substring(lastIndex, match.index));
+    }
 
-  phrases.forEach(phrase => {
-    const newResult: (string | React.ReactNode)[] = [];
-    result.forEach(part => {
-      if (typeof part === 'string') {
-        const segments = part.split(phrase.text);
-        segments.forEach((segment, i) => {
-          newResult.push(segment);
-          if (i < segments.length - 1) {
-            newResult.push(
-              <Link key={phrase.text + i} href={phrase.href} className="text-blue-600 dark:text-blue-400 hover:underline font-medium">
-                {phrase.text}
-              </Link>
-            );
-          }
-        });
-      } else {
-        newResult.push(part);
-      }
-    });
-    result = newResult;
-  });
+    const linkText = match[1];
+    const linkUrl = match[2];
 
-  return result;
+    parts.push(
+      <Link
+        key={match.index}
+        href={linkUrl}
+        className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+      >
+        {linkText}
+      </Link>
+    );
+
+    lastIndex = regex.lastIndex;
+  }
+
+  // Add remaining text
+  if (lastIndex < text.length) {
+    parts.push(text.substring(lastIndex));
+  }
+
+  return parts.length > 0 ? parts : [text];
 }

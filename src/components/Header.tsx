@@ -25,7 +25,7 @@ export default function Header() {
             <Link href="/prescription-abbreviations" className="text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-colors">Abbreviations</Link>
             <Link href="/how-to-read-a-prescription" className="text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-colors">How to Read</Link>
             <Link href="/faq" className="text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-colors">FAQ</Link>
-            <Link href="/rxnotes" className="text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-colors">Blog</Link>
+            <Link href="/rxnotes" className="text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-colors">RxNotes</Link>
             <div className="relative group">
               <button className="text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg transition-colors flex items-center gap-1">
                 More Tools <span className="text-xs">▾</span>
@@ -39,20 +39,20 @@ export default function Header() {
                       <div className="text-xs text-gray-500 dark:text-gray-500">Check medicine safety</div>
                     </div>
                   </Link>
-                  <div className="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-400 cursor-not-allowed rounded-lg">
+                  <Link href="/lab-report-explainer" className="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg transition-colors">
                     <span>🧪</span>
                     <div>
                       <div className="font-medium">Lab Report Explainer</div>
-                      <div className="text-xs text-gray-500">Coming Soon</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-500">Understand test results</div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-400 cursor-not-allowed rounded-lg">
+                  </Link>
+                  <Link href="/child-dose-calculator" className="flex items-center gap-3 px-3 py-2.5 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/30 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg transition-colors">
                     <span>👶</span>
                     <div>
                       <div className="font-medium">Child Dose Calculator</div>
-                      <div className="text-xs text-gray-500">Coming Soon</div>
+                      <div className="text-xs text-gray-500 dark:text-gray-500">Calculate pediatric doses</div>
                     </div>
-                  </div>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -89,18 +89,18 @@ export default function Header() {
             <Link href="/prescription-abbreviations" onClick={() => setOpen(false)} className="px-3 py-2.5 text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 rounded-lg transition-colors">📖 Abbreviations</Link>
             <Link href="/how-to-read-a-prescription" onClick={() => setOpen(false)} className="px-3 py-2.5 text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 rounded-lg transition-colors">📋 How to Read</Link>
             <Link href="/faq" onClick={() => setOpen(false)} className="px-3 py-2.5 text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 rounded-lg transition-colors">❓ FAQ</Link>
-            <Link href="/rxnotes" onClick={() => setOpen(false)} className="px-3 py-2.5 text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 rounded-lg transition-colors">📝 Blog</Link>
+            <Link href="/rxnotes" onClick={() => setOpen(false)} className="px-3 py-2.5 text-sm font-medium text-blue-100 hover:text-white hover:bg-white/10 rounded-lg transition-colors">📝 RxNotes</Link>
             <div className="px-3 py-2">
               <p className="text-xs font-semibold text-blue-300 uppercase tracking-wider mb-2">More Tools</p>
               <Link href="/drug-interaction-checker" onClick={() => setOpen(false)} className="flex items-center gap-2 py-2 text-sm text-blue-100 hover:text-white">
                 🔍 Drug Interaction Checker
               </Link>
-              <span className="flex items-center gap-2 py-2 text-sm text-blue-300/50">
-                🧪 Lab Report Explainer <span className="text-xs bg-white/10 px-2 py-0.5 rounded-full">Soon</span>
-              </span>
-              <span className="flex items-center gap-2 py-2 text-sm text-blue-300/50">
-                👶 Child Dose Calculator <span className="text-xs bg-white/10 px-2 py-0.5 rounded-full">Soon</span>
-              </span>
+              <Link href="/lab-report-explainer" onClick={() => setOpen(false)} className="flex items-center gap-2 py-2 text-sm text-blue-100 hover:text-white">
+                🧪 Lab Report Explainer
+              </Link>
+              <Link href="/child-dose-calculator" onClick={() => setOpen(false)} className="flex items-center gap-2 py-2 text-sm text-blue-100 hover:text-white">
+                👶 Child Dose Calculator
+              </Link>
             </div>
             <div className="px-3 pt-2">
               <Link href="/#upload" onClick={() => setOpen(false)} className="block bg-white text-blue-600 text-sm font-bold px-4 py-2.5 rounded-lg text-center hover:bg-blue-50 transition-colors">
