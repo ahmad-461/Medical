@@ -6,8 +6,17 @@
   - Local:        http://localhost:3000
 
  ✓ Starting...
- ✓ Ready in 1715ms
+ ✓ Ready in 1722ms
+ ○ Compiling /rxnotes ...
+ ✓ Compiled /rxnotes in 4.5s (580 modules)
+ HEAD /rxnotes 200 in 4811ms
+ ✓ Compiled in 487ms (277 modules)
  ○ Compiling / ...
- ✓ Compiled / in 11.6s (1166 modules)
- GET / 200 in 12789ms
- ✓ Compiled in 1248ms (538 modules)
+ ✓ Compiled / in 5.9s (1144 modules)
+ GET / 200 in 6736ms
+ ✓ Compiled /rxnotes in 124ms (623 modules)
+ GET /rxnotes 200 in 204ms
+ ✓ Compiled /rxnotes/[slug] in 335ms (1156 modules)
+ GET /rxnotes/non-existent-post 404 in 128ms
+ GET / 200 in 228ms
+ ✓ Compiled in 25ms
