@@ -25,6 +25,7 @@ export async function POST(req: Request) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
 
+    console.log('[Interactions] Initializing model: gemini-flash-latest');
     const genAI = new GoogleGenerativeAI(apiKey);
     const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
 
@@ -72,9 +73,10 @@ Return only JSON, nothing else.`;
       return NextResponse.json(parsed, { status: 200 });
     } catch (apiError: unknown) {
       const apiErrorMessage = apiError instanceof Error ? apiError.message : String(apiError);
-      console.error('[interactions] Gemini API error:', apiErrorMessage);
+      const taggedError = `[Model: gemini-flash-latest] ${apiErrorMessage}`;
+      console.error('[interactions] Gemini API error:', taggedError);
 
-      let finalMessage = apiErrorMessage;
+      let finalMessage = taggedError;
       if (apiErrorMessage.includes('404') || apiErrorMessage.includes('not found')) {
         try {
           const diagResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);

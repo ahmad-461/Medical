@@ -7,6 +7,7 @@ export async function extractPrescriptionData(
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
 
+  console.log('[Gemini] Initializing model: gemini-flash-latest');
   const genAI = new GoogleGenerativeAI(apiKey);
   const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
 
@@ -43,7 +44,8 @@ If unreadable return: {"error":"unreadable"}`;
     return { text };
   } catch (error: unknown) {
     const errorMessage = error instanceof Error ? error.message : String(error);
-    console.error('[Gemini Error]:', errorMessage);
+    const finalError = `[Model: gemini-flash-latest] ${errorMessage}`;
+    console.error('[Gemini Error]:', finalError);
 
     let availableModels: string[] | undefined;
     if (errorMessage.includes('404') || errorMessage.includes('not found')) {
@@ -59,8 +61,8 @@ If unreadable return: {"error":"unreadable"}`;
     }
 
     if (availableModels) {
-      throw new Error(`${errorMessage} | Available models for your key: ${availableModels.join(', ')}`);
+      throw new Error(`${finalError} | Available models for your key: ${availableModels.join(', ')}`);
     }
-    throw error;
+    throw new Error(finalError);
   }
 }
