@@ -25,8 +25,9 @@ export async function POST(req: Request) {
     const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
 
+    console.log('[Interactions] Initializing model: gemini-flash-latest');
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
 
     const medicineList = medicines.join(', ');
 
@@ -56,19 +57,44 @@ If all medicines are safe together set overall_safety to "safe" and interactions
 Always set consult_doctor to true.
 Return only JSON, nothing else.`;
 
-    const result = await model.generateContent(prompt);
-    const rawText = result.response.text();
-
-    let parsed: unknown;
     try {
-      const clean = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
-      parsed = JSON.parse(clean);
-    } catch (e) {
-      console.error('[interactions] parse error:', e);
-      return NextResponse.json({ error: 'parse_failed' }, { status: 500 });
-    }
+      const result = await model.generateContent(prompt);
+      const rawText = result.response.text();
 
-    return NextResponse.json(parsed, { status: 200 });
+      let parsed: unknown;
+      try {
+        const clean = rawText.replace(/```json/g, '').replace(/```/g, '').trim();
+        parsed = JSON.parse(clean);
+      } catch (e) {
+        console.error('[interactions] parse error:', e);
+        return NextResponse.json({ error: 'parse_failed' }, { status: 500 });
+      }
+
+      return NextResponse.json(parsed, { status: 200 });
+    } catch (apiError: unknown) {
+      const apiErrorMessage = apiError instanceof Error ? apiError.message : String(apiError);
+      const taggedError = `[Model: gemini-flash-latest] ${apiErrorMessage}`;
+      console.error('[interactions] Gemini API error:', taggedError);
+
+      let finalMessage = taggedError;
+      if (apiErrorMessage.includes('404') || apiErrorMessage.includes('not found')) {
+        try {
+          const diagResp = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+          const diagData = await diagResp.json() as { models?: Array<{ name: string }> };
+          const availableModels = diagData.models?.map(m => m.name);
+          if (availableModels) {
+            finalMessage = `${apiErrorMessage} | Available models for your key: ${availableModels.join(', ')}`;
+          }
+          console.error('[interactions] [Diagnostic] Available models:', JSON.stringify(availableModels));
+        } catch (diagErr) {
+          console.error('[interactions] [Diagnostic] Failed diagnostic list:', diagErr);
+        }
+      }
+      return NextResponse.json(
+        { error: 'api_error', message: finalMessage },
+        { status: 500 }
+      );
+    }
 
   } catch (err: unknown) {
     const errorMessage = err instanceof Error ? err.message : String(err);

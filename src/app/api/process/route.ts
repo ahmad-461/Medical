@@ -31,7 +31,18 @@ export async function POST(req: Request) {
     const mimeType = fileData.type || 'image/jpeg';
 
     // Send to Gemini
-    const rawText = await extractPrescriptionData(base64, mimeType);
+    let geminiResponse: { text: string; available_models?: string[] };
+    try {
+      geminiResponse = await extractPrescriptionData(base64, mimeType);
+    } catch (geminiErr: unknown) {
+      const msg = geminiErr instanceof Error ? geminiErr.message : String(geminiErr);
+      return NextResponse.json({
+        error: 'gemini_error',
+        message: msg
+      }, { status: 500 });
+    }
+
+    const rawText = geminiResponse.text;
 
     // Parse JSON
     let parsed: Record<string, unknown>;

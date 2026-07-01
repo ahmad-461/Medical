@@ -3,12 +3,13 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 export async function extractPrescriptionData(
   imageBase64: string,
   mimeType: string
-): Promise<string> {
+): Promise<{ text: string; available_models?: string[] }> {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) throw new Error('GEMINI_API_KEY is not set');
 
+  console.log('[Gemini] Initializing model: gemini-flash-latest');
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  const model = genAI.getGenerativeModel({ model: 'gemini-flash-latest' });
 
   const prompt = `You are a medical prescription reader. Analyze this prescription image and extract all medicine information. Return ONLY valid JSON with no markdown, no backticks, no code fences, no explanation.
 
@@ -33,11 +34,35 @@ Return exactly this JSON structure:
 If not a prescription return: {"error":"not_a_prescription"}
 If unreadable return: {"error":"unreadable"}`;
 
-  const result = await model.generateContent([
-    { inlineData: { mimeType, data: imageBase64 } },
-    { text: prompt },
-  ]);
+  try {
+    const result = await model.generateContent([
+      { inlineData: { mimeType, data: imageBase64 } },
+      { text: prompt },
+    ]);
 
-  const text = result.response.text();
-  return text;
+    const text = result.response.text();
+    return { text };
+  } catch (error: unknown) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    const finalError = `[Model: gemini-flash-latest] ${errorMessage}`;
+    console.error('[Gemini Error]:', finalError);
+
+    let availableModels: string[] | undefined;
+    if (errorMessage.includes('404') || errorMessage.includes('not found')) {
+      console.error('[Diagnostic] Attempting to list available models...');
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+        const data = await response.json() as { models?: Array<{ name: string }> };
+        availableModels = data.models?.map(m => m.name);
+        console.error('[Diagnostic] Available models:', JSON.stringify(availableModels));
+      } catch (listError) {
+        console.error('[Diagnostic] Failed to list models:', listError);
+      }
+    }
+
+    if (availableModels) {
+      throw new Error(`${finalError} | Available models for your key: ${availableModels.join(', ')}`);
+    }
+    throw new Error(finalError);
+  }
 }
